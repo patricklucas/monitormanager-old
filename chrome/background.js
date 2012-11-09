@@ -20,10 +20,20 @@
     };
 
     var actionReload = function(hard) {
+        if (!tab) {
+            return;
+        }
+
         chrome.tabs.reload(tab.id, {bypassCache: hard});
     };
 
     var actionUrl = function(url) {
+        monitor_url = url;
+
+        if (!tab) {
+            return;
+        }
+
         chrome.tabs.update(tab.id, {url: url});
     };
 
