@@ -5,7 +5,7 @@
     "description": "Yo, dawg",
     "browser_action": {
         "default_icon": "icon.png",
-        "default_popup": "monitormanager.html"
+        "default_popup": "popup.html"
     },
     "background": {
         "scripts": ["background.js"]
