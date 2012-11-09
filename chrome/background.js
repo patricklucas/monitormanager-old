@@ -20,15 +20,41 @@
         });
     };
 
+    var actionReload = function(hard) {
+        hard = hard || false;
+        chrome.tabs.reload(tab.id, {bypassCache: hard});
+    };
+
+    var actionUrl = function(url) {
+        chrome.tabs.update(tab.id, {url: url});
+    };
+
     var connect = function() {
         ws = new WebSocket(ws_url + monitor_name);
-
-        ws.onmessage = function(e) {
-            console.log(e.data);
-        };
-
+        /* Set up callbacks upon connect (in pollForConnect) */
         pollForConnect();
     };
+
+    var ws_onmessage = function(e) {
+        var data = JSON.parse(e.data);
+
+        switch (data.action) {
+        case 'reload':
+            actionReload();
+            break;
+        case 'url':
+            actionUrl(data.url);
+            break;
+        default:
+            console.log("Unknown action: " + data.action);
+        };
+    };
+
+    var ws_onclose = function() {
+        if (enabled) {
+            setTimeout(tryReconnect, 1000);
+        }
+    }
 
     var reconnect = function() {
         ws.onclose = null; // Disable the reconnecting onclose handler
@@ -42,11 +68,8 @@
 
     var pollForConnect = function() {
         if (ws.readyState == ws.OPEN) {
-            ws.onclose = function() {
-                if (enabled) {
-                    setTimeout(tryReconnect, 1000);
-                }
-            };
+            ws.onmessage = ws_onmessage;
+            ws.onclose = ws_onclose;
         } else if (ws.readyState == ws.CONNECTING) {
             setTimeout(pollForConnect, 1000);
         } else { // CLOSED or CLOSING
