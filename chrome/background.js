@@ -1,15 +1,30 @@
 (function() {
+
     const ws_url = "ws://localhost:8123/monitor/";
 
+    // Refs
     var ws,
-        enabled = true,
-        monitor_name = "default";
+        tab;
+
+    // State
+    var enabled = true,
+        monitor_name = "default",
+        monitor_url = "about:blank";
 
     var init = function() {
+        connect();
+        chrome.tabs.onRemoved.addListener(function(tabId) {
+            if (tab.id == tabId) {
+                tab = null;
+            }
+        });
+    };
+
+    var connect = function() {
         ws = new WebSocket(ws_url + monitor_name);
 
         ws.onmessage = function(e) {
-            console.log(e);
+            console.log(e.data);
         };
 
         pollForConnect();
@@ -18,11 +33,11 @@
     var reconnect = function() {
         ws.onclose = null; // Disable the reconnecting onclose handler
         ws.close();
-        init();
+        connect();
     };
 
     var tryReconnect = function() {
-        init();
+        connect();
     };
 
     var pollForConnect = function() {
@@ -39,8 +54,6 @@
         }
     };
 
-    init();
-
     window.mm_send = function(message) {
         ws.send(message);
     }
@@ -49,7 +62,7 @@
         enabled = !!enable;
 
         if (enabled) {
-            init();
+            connect();
             console.log("ENABLED");
         } else {
             ws.close();
@@ -74,4 +87,22 @@
         monitor_name = name;
         reconnect();
     };
+
+    window.mm_isTabOpen = function(callback) {
+        return !!tab;
+    };
+
+    // Time for some drinks
+    window.mm_openTab = function() {
+        if (tab) {
+            return;
+        }
+
+        chrome.tabs.create({url: monitor_url}, function(newTab) {
+            tab = newTab;
+        });
+    };
+
+    init();
+
 })();
