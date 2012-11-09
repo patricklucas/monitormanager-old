@@ -24,10 +24,6 @@
         e.srcElement.disabled = true;
     };
 
-    var sendMessageEvent = function() {
-        bg.mm_send("hi");
-    };
-
     var initEvent = function(id, ev, callback) {
         getEl(id).addEventListener(ev, callback);
     };
@@ -37,7 +33,6 @@
         initEvent('monitor_name_save', 'click', changeNameEvent);
         initEvent('service_url_save', 'click', changeServiceUrlEvent);
         initEvent('open_monitor_tab', 'click', openMonitorTabEvent);
-        initEvent('send_message', 'click', sendMessageEvent);
     };
 
     var initFormFields = function() {

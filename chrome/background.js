@@ -75,9 +75,9 @@
         }
     };
 
-    window.mm_send = function(message) {
-        ws.send(message);
-    }
+    window.mm_isEnabled = function() {
+        return enabled;
+    };
 
     window.mm_enable = function(enable) {
         enabled = !!enable;
@@ -92,9 +92,6 @@
         }
     };
 
-    window.mm_isEnabled = function() {
-        return enabled;
-    };
     window.mm_getServiceUrl = function() {
         return service_url;
     };
