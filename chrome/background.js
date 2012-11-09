@@ -21,7 +21,6 @@
     };
 
     var actionReload = function(hard) {
-        hard = hard || false;
         chrome.tabs.reload(tab.id, {bypassCache: hard});
     };
 
@@ -40,7 +39,7 @@
 
         switch (data.action) {
         case 'reload':
-            actionReload();
+            actionReload(data.hard);
             break;
         case 'url':
             actionUrl(data.url);

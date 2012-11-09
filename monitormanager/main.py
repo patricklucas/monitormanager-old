@@ -36,18 +36,24 @@ class StatusHandler(tornado.web.RequestHandler):
 
 class MonitorPingHandler(tornado.web.RequestHandler):
 
-    def get(self, monitor, action):
+    def post(self, monitor, action):
         if not monitor in monitors:
             return
 
         if action == 'reload':
+            hard_str = self.get_argument('hard', "false")
+            hard = (hard_str == "true")
+
             message = json.dumps({
-                'action': "reload"
+                'action': "reload",
+                'hard': hard
             })
         elif action == 'url':
+            url = self.get_argument('url')
+
             message = json.dumps({
                 'action': "url",
-                'url': "http://www.google.com"
+                'url': url
             })
         else:
             message = None
