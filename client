@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SERVICE="http://localhost:8123/ping"
+SERVICE="http://localhost:8123/action"
 
 MONITOR="$1"
 ACTION="$2"

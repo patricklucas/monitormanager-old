@@ -65,9 +65,8 @@ class MonitorPingHandler(tornado.web.RequestHandler):
 
 application = tornado.web.Application([
     (r"/monitor/(.*)", MonitorSocketHandler),
-    (r"/ping/(.*)/(.*)", MonitorPingHandler),
+    (r"/action/(.*)/(.*)", MonitorPingHandler),
     (r"/status", StatusHandler),
-    (r"/", StatusHandler)
 ])
 
 application.listen(8123)
