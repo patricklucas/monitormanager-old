@@ -14,6 +14,11 @@
         bg.mm_setName(newName);
     };
 
+    var changeServiceUrlEvent = function() {
+        var newServiceUrl = getEl('service_url').value;
+        bg.mm_setServiceUrl(newServiceUrl);
+    };
+
     var openMonitorTabEvent = function(e) {
         bg.mm_openTab();
         e.srcElement.disabled = true;
@@ -30,6 +35,7 @@
     var initEvents = function() {
         initEvent('disable_check', 'change', disableEvent);
         initEvent('monitor_name_save', 'click', changeNameEvent);
+        initEvent('service_url_save', 'click', changeServiceUrlEvent);
         initEvent('open_monitor_tab', 'click', openMonitorTabEvent);
         initEvent('send_message', 'click', sendMessageEvent);
     };
@@ -37,6 +43,7 @@
     var initFormFields = function() {
         getEl('disable_check').checked = !bg.mm_isEnabled();
         getEl('monitor_name').value = bg.mm_getName();
+        getEl('service_url').value = bg.mm_getServiceUrl();
         getEl('open_monitor_tab').disabled = bg.mm_isTabOpen();
     };
 

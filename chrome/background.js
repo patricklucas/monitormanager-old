@@ -1,13 +1,12 @@
 (function() {
 
-    const ws_url = "ws://localhost:8123/monitor/";
-
     // Refs
     var ws,
         tab;
 
     // State
     var enabled = true,
+        service_url = "ws://localhost:8123/monitor/";
         monitor_name = "default",
         monitor_url = "about:blank";
 
@@ -29,7 +28,7 @@
     };
 
     var connect = function() {
-        ws = new WebSocket(ws_url + monitor_name);
+        ws = new WebSocket(service_url + monitor_name);
         /* Set up callbacks upon connect (in pollForConnect) */
         pollForConnect();
     };
@@ -95,6 +94,14 @@
 
     window.mm_isEnabled = function() {
         return enabled;
+    };
+    window.mm_getServiceUrl = function() {
+        return service_url;
+    };
+
+    window.mm_setServiceUrl = function(url) {
+        service_url = url;
+        reconnect();
     };
 
     window.mm_getName = function() {
