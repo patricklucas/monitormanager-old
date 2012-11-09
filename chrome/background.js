@@ -1,5 +1,5 @@
 (function() {
-    const ws_url = "ws://dev22.706.yelpcorp.com:8123/monitor/";
+    const ws_url = "ws://localhost:8123/monitor/";
 
     var ws,
         enabled = true,
