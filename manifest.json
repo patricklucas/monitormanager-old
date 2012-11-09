@@ -1,0 +1,16 @@
+{
+    "name": "Yelp Monitor Manager",
+    "version": "0.0.1",
+    "manifest_version": 2,
+    "description": "Yo, dawg",
+    "browser_action": {
+        "default_icon": "icon.png",
+        "default_popup": "monitormanager.html"
+    },
+    "permissions": [
+        "http://api.flickr.com/"
+    ],
+    "background": {
+        "scripts": ["background.js"]
+    }
+}
