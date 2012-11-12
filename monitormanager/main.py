@@ -207,7 +207,7 @@ application = Application([
     (r"/manage/monitor/(.*)/reload", ManageMonitorReloadHandler),
     (r"/manage/monitor/(.*)", ManageMonitorHandler),
     (r"/status", StatusHandler),
-])
+], template_path="templates")
 
 application.listen(8123)
 tornado.ioloop.IOLoop.instance().start()
