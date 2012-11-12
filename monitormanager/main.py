@@ -15,25 +15,46 @@ from weakset import WeakSet
 
 monitors = defaultdict(WeakSet)
 
+def send_to_monitors(monitor_name, message):
+    for monitor in monitors[monitor_name]:
+        monitor.write_message(message)
+
+
 class MonitorSocketHandler(tornado.websocket.WebSocketHandler):
 
-    def open(self, monitor):
-        self._monitor = monitor
-        monitors[self._monitor].add(self)
+    def open(self, monitor_name):
+        self._monitor_name = monitor_name
+        monitors[self._monitor_name].add(self)
+
+        session = Session()
+
+        monitor = session.query(Monitor) \
+            .filter(Monitor.name == monitor_name) \
+            .first()
+
+        if not monitor:
+            return
+
+        message = json.dumps({
+            'action': "url",
+            'url': monitor.url
+        })
+
+        self.write_message(message)
 
     def on_message(self, message):
         pass
 
     def on_close(self):
-        monitors[self._monitor].remove(self)
-        if not monitors[self._monitor]:
-            del monitors[self._monitor]
+        monitors[self._monitor_name].remove(self)
+        if not monitors[self._monitor_name]:
+            del monitors[self._monitor_name]
 
 
 class MonitorPingHandler(RequestHandler):
 
-    def post(self, monitor, action):
-        if not monitor in monitors:
+    def post(self, monitor_name, action):
+        if not monitor_name in monitors:
             return
 
         if action == 'reload':
@@ -55,8 +76,7 @@ class MonitorPingHandler(RequestHandler):
             message = None
 
         if message:
-            for conn in monitors[monitor]:
-                conn.write_message(message)
+            send_to_monitors(monitor_name, message)
 
 
 class ManageMonitorHandler(RequestHandler):
@@ -92,6 +112,13 @@ class ManageMonitorHandler(RequestHandler):
 
         session.commit()
 
+        message = json.dumps({
+            'action': "url",
+            'url': monitor.url
+        })
+
+        send_to_monitors(monitor.name, message)
+
         self.redirect("/manage/monitor/%s" % monitor.name, status=303)
 
     def put(self, monitor_name):
@@ -116,6 +143,13 @@ class ManageMonitorHandler(RequestHandler):
 
         session.add(new_monitor)
         session.commit()
+
+        message = json.dumps({
+            'action': "url",
+            'url': new_monitor.url
+        })
+
+        send_to_monitors(new_monitor.name, message)
 
         self.redirect("/manage/monitor/%s" % new_monitor.name, status=303)
 
