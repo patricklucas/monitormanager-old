@@ -27,10 +27,7 @@ class MonitorSocketHandler(tornado.websocket.WebSocketHandler):
         monitors[self._monitor_name].add(self)
 
         session = Session()
-
-        monitor = session.query(Monitor) \
-            .filter(Monitor.name == monitor_name) \
-            .first()
+        monitor = Monitor.get(session, monitor_name)
 
         if not monitor:
             return
@@ -61,7 +58,7 @@ class ManageMonitorsHandler(RequestHandler):
 
     def get(self):
         session = Session()
-        monitors = [monitor.todict() for monitor in session.query(Monitor)]
+        monitors = [monitor.todict() for monitor in Monitor.getall(session)]
         self.write({'monitors': monitors})
 
 
@@ -69,10 +66,7 @@ class ManageMonitorHandler(RequestHandler):
 
     def get(self, monitor_name):
         session = Session()
-
-        monitor = session.query(Monitor) \
-            .filter(Monitor.name == monitor_name) \
-            .first()
+        monitor = Monitor.get(session, monitor_name)
 
         if not monitor:
             raise HTTPError(404)
@@ -81,10 +75,7 @@ class ManageMonitorHandler(RequestHandler):
 
     def post(self, monitor_name):
         session = Session()
-
-        monitor = session.query(Monitor) \
-            .filter(Monitor.name == monitor_name) \
-            .first()
+        monitor = Monitor.get(session, monitor_name)
 
         if not monitor:
             raise HTTPError(404)
@@ -109,10 +100,7 @@ class ManageMonitorHandler(RequestHandler):
 
     def put(self, monitor_name):
         session = Session()
-
-        monitor = session.query(Monitor) \
-            .filter(Monitor.name == monitor_name) \
-            .first()
+        monitor = Monitor.get(session, monitor_name)
 
         if monitor:
             raise HTTPError(400)
@@ -142,10 +130,7 @@ class ManageMonitorHandler(RequestHandler):
 
     def delete(self, monitor_name):
         session = Session()
-
-        deleted  = session.query(Monitor) \
-            .filter(Monitor.name == monitor_name) \
-            .delete()
+        deleted = Monitor.delete(session, monitor_name)
 
         if not deleted:
             session.rollback()
@@ -158,10 +143,7 @@ class ManageMonitorReloadHandler(RequestHandler):
 
     def post(self, monitor_name):
         session = Session()
-
-        monitor = session.query(Monitor) \
-            .filter(Monitor.name == monitor_name) \
-            .first()
+        monitor = Monitor.get(session, monitor_name)
 
         if not monitor:
             raise HTTPError(404)

@@ -18,6 +18,22 @@ class Monitor(Base):
         self.name = name
         self.url = url
 
+    @classmethod
+    def get(cls, session, monitor_name):
+        return session.query(Monitor) \
+            .filter(Monitor.name == monitor_name) \
+            .first()
+
+    @classmethod
+    def getall(cls, session):
+        return session.query(Monitor)
+
+    @classmethod
+    def delete(cls, session, monitor_name):
+        return bool(session.query(Monitor) \
+            .filter(Monitor.name == monitor_name) \
+            .delete())
+
     def todict(self):
         return {
             'id': self.id,
