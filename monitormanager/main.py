@@ -79,6 +79,20 @@ class MonitorPingHandler(RequestHandler):
             send_to_monitors(monitor_name, message)
 
 
+class ManageHandler(RequestHandler):
+
+    def get(self):
+        self.render("manage.html")
+
+
+class ManageMonitorsHandler(RequestHandler):
+
+    def get(self):
+        session = Session()
+        monitors = [monitor.todict() for monitor in session.query(Monitor)]
+        self.write({'monitors': monitors})
+
+
 class ManageMonitorHandler(RequestHandler):
 
     def get(self, monitor_name):
@@ -154,6 +168,31 @@ class ManageMonitorHandler(RequestHandler):
         self.redirect("/manage/monitor/%s" % new_monitor.name, status=303)
 
 
+class ManageMonitorReloadHandler(RequestHandler):
+
+    def post(self, monitor_name):
+        session = Session()
+
+        monitor = session.query(Monitor) \
+            .filter(Monitor.name == monitor_name) \
+            .first()
+
+        if not monitor:
+            raise HTTPError(404)
+
+        data = json.loads(self.request.body)
+
+        if 'hard' not in data:
+            raise HTTPError(400)
+
+        message = json.dumps({
+            'action': "reload",
+            'hard': data['hard']
+        })
+
+        send_to_monitors(monitor.name, message)
+
+
 class StatusHandler(RequestHandler):
 
     def get(self):
@@ -163,6 +202,9 @@ class StatusHandler(RequestHandler):
 application = Application([
     (r"/monitor/(.*)", MonitorSocketHandler),
     (r"/action/(.*)/(.*)", MonitorPingHandler),
+    (r"/manage", ManageHandler),
+    (r"/manage/monitors", ManageMonitorsHandler),
+    (r"/manage/monitor/(.*)/reload", ManageMonitorReloadHandler),
     (r"/manage/monitor/(.*)", ManageMonitorHandler),
     (r"/status", StatusHandler),
 ])
