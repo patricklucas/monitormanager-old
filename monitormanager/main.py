@@ -51,34 +51,6 @@ class MonitorSocketHandler(tornado.websocket.WebSocketHandler):
             del monitors[self._monitor_name]
 
 
-class MonitorPingHandler(RequestHandler):
-
-    def post(self, monitor_name, action):
-        if not monitor_name in monitors:
-            return
-
-        if action == 'reload':
-            hard_str = self.get_argument('hard', "false")
-            hard = (hard_str == "true")
-
-            message = json.dumps({
-                'action': "reload",
-                'hard': hard
-            })
-        elif action == 'url':
-            url = self.get_argument('url')
-
-            message = json.dumps({
-                'action': "url",
-                'url': url
-            })
-        else:
-            message = None
-
-        if message:
-            send_to_monitors(monitor_name, message)
-
-
 class ManageHandler(RequestHandler):
 
     def get(self):
@@ -215,7 +187,6 @@ class StatusHandler(RequestHandler):
 
 application = Application([
     (r"/monitor/(.*)", MonitorSocketHandler),
-    (r"/action/(.*)/(.*)", MonitorPingHandler),
     (r"/manage", ManageHandler),
     (r"/manage/monitors", ManageMonitorsHandler),
     (r"/manage/monitor/(.*)/reload", ManageMonitorReloadHandler),
