@@ -61,11 +61,36 @@ $(document).ready(function() {
 		});
 	};
 
+    var initMonitorCreateForm = function() {
+        var form = $("div#monitor_create_form");
+        form.find("input#monitor_create_submit").click(function() {
+            var name = form.find("input#monitor_create_name").val();
+            var url = form.find("input#monitor_create_url").val();
+
+            $.ajax({
+                type: 'PUT',
+                url: "/manage/monitor/" + name,
+                data: JSON.stringify({url: url}),
+                dataType: 'json',
+                success: function() {
+                    load_monitors_table();
+                }
+            });
+        });
+    }
+
 	load_monitors_table();
+    initMonitorCreateForm();
 });
 </script>
 </head>
 <body>
+    <div id="monitor_create_form">
+        <strong>Create Monitor | </strong>
+        <label for="monitor_create_name">Name:</label> <input id="monitor_create_name" type="text"/>
+        <label for="monitor_create_url">URL:</label> <input id="monitor_create_url" type="text"/>
+        <input id="monitor_create_submit" type="button" value="Save"/>
+    </div>
 	<table width="750px" border="1" id="monitors_table">
 	<thead>
 		<tr>
