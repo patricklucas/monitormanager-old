@@ -6,9 +6,11 @@ except ImportError:
     import simplejson as json
 
 import tornado.ioloop
-import tornado.web
+from tornado.web import Application, RequestHandler, HTTPError
 import tornado.websocket
 
+from model import Session, Monitor
+from requesthandler import RequestHandler
 from weakset import WeakSet
 
 monitors = defaultdict(WeakSet)
@@ -28,13 +30,7 @@ class MonitorSocketHandler(tornado.websocket.WebSocketHandler):
             del monitors[self._monitor]
 
 
-class StatusHandler(tornado.web.RequestHandler):
-
-    def get(self):
-        self.write('yep')
-
-
-class MonitorPingHandler(tornado.web.RequestHandler):
+class MonitorPingHandler(RequestHandler):
 
     def post(self, monitor, action):
         if not monitor in monitors:
@@ -63,9 +59,77 @@ class MonitorPingHandler(tornado.web.RequestHandler):
                 conn.write_message(message)
 
 
-application = tornado.web.Application([
+class ManageMonitorHandler(RequestHandler):
+
+    def get(self, monitor_name):
+        session = Session()
+
+        monitor = session.query(Monitor) \
+            .filter(Monitor.name == monitor_name) \
+            .first()
+
+        if not monitor:
+            raise HTTPError(404)
+
+        self.write(monitor.todict())
+
+    def post(self, monitor_name):
+        session = Session()
+
+        monitor = session.query(Monitor) \
+            .filter(Monitor.name == monitor_name) \
+            .first()
+
+        if not monitor:
+            raise HTTPError(404)
+
+        data = json.loads(self.request.body)
+
+        if 'url' not in data:
+            raise HTTPError(400)
+
+        monitor.url = data['url']
+
+        session.commit()
+
+        self.redirect("/manage/monitor/%s" % monitor.name, status=303)
+
+    def put(self, monitor_name):
+        session = Session()
+
+        monitor = session.query(Monitor) \
+            .filter(Monitor.name == monitor_name) \
+            .first()
+
+        if monitor:
+            raise HTTPError(400)
+
+        data = json.loads(self.request.body)
+
+        if 'url' not in data:
+            raise HTTPError(400)
+
+        new_monitor = Monitor(
+            name=monitor_name,
+            url=data['url'],
+        )
+
+        session.add(new_monitor)
+        session.commit()
+
+        self.redirect("/manage/monitor/%s" % new_monitor.name, status=303)
+
+
+class StatusHandler(RequestHandler):
+
+    def get(self):
+        self.write('yep')
+
+
+application = Application([
     (r"/monitor/(.*)", MonitorSocketHandler),
     (r"/action/(.*)/(.*)", MonitorPingHandler),
+    (r"/manage/monitor/(.*)", ManageMonitorHandler),
     (r"/status", StatusHandler),
 ])
 
