@@ -35,6 +35,18 @@ $(document).ready(function() {
                         });
                     });
 
+                var deleteButton = $("<input type=\"button\"/>")
+                    .val("Delete")
+                    .click(function() {
+                        $.ajax({
+                            type: 'DELETE',
+                            url: "/manage/monitor/" + monitor.name,
+                            success: function() {
+                                load_monitors_table();
+                            }
+                        });
+                    });
+
                 tbody.append($("<tr/>")
                     .append($("<td/>").text(monitor.id))
                     .append($("<td/>").text(monitor.name))
@@ -42,6 +54,7 @@ $(document).ready(function() {
                     .append($("<td/>")
                         .append(saveButton)
                         .append(reloadButton)
+                        .append(deleteButton)
                     )
                 );
 			});

@@ -168,6 +168,20 @@ class ManageMonitorHandler(RequestHandler):
         self.redirect("/manage/monitor/%s" % new_monitor.name, status=303)
 
 
+    def delete(self, monitor_name):
+        session = Session()
+
+        deleted  = session.query(Monitor) \
+            .filter(Monitor.name == monitor_name) \
+            .delete()
+
+        if not deleted:
+            session.rollback()
+            raise HTTPError(404)
+
+        session.commit()
+
+
 class ManageMonitorReloadHandler(RequestHandler):
 
     def post(self, monitor_name):
