@@ -1,10 +1,11 @@
+<!DOCTYPE html>
 <html>
 <head>
 <title>Monitor Manager</title>
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 <script>
 $(document).ready(function() {
-    var load_monitors_table = function() {
+    var loadMonitorsTable = function() {
         $.getJSON("/manage/monitors", function(data) {
             var tbody = $("table#monitors_table tbody");
             tbody.empty();
@@ -42,7 +43,7 @@ $(document).ready(function() {
                             type: 'DELETE',
                             url: "/manage/monitor/" + monitor.name,
                             success: function() {
-                                load_monitors_table();
+                                loadMonitorsTable();
                             }
                         });
                     });
@@ -73,31 +74,40 @@ $(document).ready(function() {
                 data: JSON.stringify({url: url}),
                 dataType: 'json',
                 success: function() {
-                    load_monitors_table();
+                    loadMonitorsTable();
                 }
             });
         });
     }
 
-    load_monitors_table();
+    loadMonitorsTable();
     initMonitorCreateForm();
 });
 </script>
+<style>
+table#monitors_table tbody input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing: border-box;
+}
+</style>
 </head>
 <body>
     <div id="monitor_create_form">
-        <strong>Create Monitor | </strong>
+        <strong>Create Monitor</strong><span style="margin-right: 15px"></span>
         <label for="monitor_create_name">Name:</label> <input id="monitor_create_name" type="text"/>
         <label for="monitor_create_url">URL:</label> <input id="monitor_create_url" type="text"/>
         <input id="monitor_create_submit" type="button" value="Save"/>
     </div>
-    <table width="750px" border="1" id="monitors_table">
+    <br/>
+    <table border="1" id="monitors_table">
     <thead>
         <tr>
             <th width="15px">ID</th>
-            <th>Name</th>
-            <th>URL</th>
-            <th>Actions</th>
+            <th width="150px">Name</th>
+            <th width="300px">URL</th>
+            <th width="0">Actions</th>
         </tr>
     </thead>
     <tbody>
