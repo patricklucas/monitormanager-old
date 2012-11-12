@@ -110,6 +110,10 @@ class ManageMonitorHandler(RequestHandler):
         if 'url' not in data:
             raise HTTPError(400)
 
+        # Disallow '/', '#', and '?' from names
+        if frozenset(['/', '#', '?']) & frozenset(monitor_name):
+            raise HTTPError(400)
+
         new_monitor = Monitor(
             name=monitor_name,
             url=data['url'],
