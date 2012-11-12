@@ -11,7 +11,7 @@ class Monitor(Base):
     __tablename__ = 'monitors'
 
     id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
+    name = Column(String, unique=True, index=True, nullable=False)
     url = Column(String, nullable=False)
 
     def __init__(self, name, url="about:blank"):
