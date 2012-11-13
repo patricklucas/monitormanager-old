@@ -6,11 +6,9 @@
 <script>
 $(document).ready(function() {
     var loadMonitorsTable = function(options) {
-        var orderBy = options && options.orderBy || null;
         var desc = options && options.desc || false;
 
         $.getJSON("/manage/monitors", {
-            order_by: orderBy,
             desc: desc
         }, function(data) {
             var tbody = $("table#monitors_table tbody");
@@ -86,19 +84,11 @@ $(document).ready(function() {
     };
 
     var initMonitorsSortLinks = function() {
-        var orderBy = "name";
         var desc = false;
 
         $("table#monitors_table th#monitor_name").click(function() {
-            orderBy = "name";
             desc = !desc;
-            loadMonitorsTable({orderBy: orderBy, desc: desc});
-        });
-
-        $("table#monitors_table th#monitor_url").click(function() {
-            orderBy = "url";
-            desc = !desc;
-            loadMonitorsTable({orderBy: orderBy, desc: desc});
+            loadMonitorsTable({desc: desc});
         });
     };
 
@@ -131,7 +121,7 @@ table#monitors_table tbody input[type="text"] {
     <thead>
         <tr>
             <th id="monitor_name" width="150px"><a href="#">Name</a></th>
-            <th id="monitor_url" width="300px"><a href="#">URL</a></th>
+            <th id="monitor_url" width="300px">URL</th>
             <th width="0">Actions</th>
         </tr>
     </thead>

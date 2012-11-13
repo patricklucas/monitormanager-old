@@ -61,19 +61,14 @@ class ManageHandler(BaseRequestHandler):
 class ManageMonitorsHandler(BaseRequestHandler):
 
     def get(self):
-        order_by = self.get_argument('order_by', "name")
         desc = (self.get_argument('desc', "false") == "true")
 
-        if order_by == "url":
-            order_by_field = Monitor.url
-        else:
-            order_by_field = Monitor.name
-
+        order_by = Monitor.name
         if desc:
-            order_by_field = order_by_field.desc()
+            order_by = order_by.desc()
 
         query = self.db.query(Monitor) \
-            .order_by(order_by_field)
+            .order_by(order_by)
 
         monitors = [monitor.todict() for monitor in query]
         self.write({'monitors': monitors})
