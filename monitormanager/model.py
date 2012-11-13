@@ -2,6 +2,8 @@
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+
+from monitormanager import config
  
 Base = declarative_base()
 
@@ -45,8 +47,16 @@ class Monitor(Base):
         return "<Monitor(%s %s)>" % (self.name, self.url)
 
 
-engine = create_engine('sqlite:////tmp/monitormanager.db')
-Session = sessionmaker(bind=engine)
+engine = None
+Session = None
+
+def init_db():
+    global engine, Session
+    engine = create_engine(unicode(config.db_uri))
+    Session = sessionmaker(bind=engine)
 
 if __name__ == '__main__':
+    # Run python -m monitormanager.model to initialize the database
+    config.load("config.yaml")
+    init_db()
     Base.metadata.create_all(engine)

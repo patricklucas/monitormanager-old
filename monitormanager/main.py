@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from collections import defaultdict
 
 try:
@@ -9,8 +11,9 @@ from tornado.ioloop import IOLoop
 from tornado.web import Application, RequestHandler, HTTPError
 from tornado.websocket import WebSocketHandler
 
-from model import Session, Monitor
-from weakset import WeakSet
+from monitormanager import config, model
+from .model import Monitor
+from .weakset import WeakSet
 
 monitors = defaultdict(WeakSet)
 
@@ -170,14 +173,25 @@ class StatusHandler(RequestHandler):
         self.write('yep')
 
 
-application = Application([
-    (r"/monitor/(.*)", MonitorSocketHandler),
-    (r"/manage", ManageHandler),
-    (r"/manage/monitors", ManageMonitorsHandler),
-    (r"/manage/monitor/(.*)/reload", ManageMonitorReloadHandler),
-    (r"/manage/monitor/(.*)", ManageMonitorHandler),
-    (r"/status", StatusHandler),
-], template_path="templates")
+def main():
+    config.load("config.yaml")
+    model.init_db()
 
-application.listen(8123)
-IOLoop.instance().start()
+    # TODO: is there a better way than this?
+    global Session
+    from .model import Session
+
+    application = Application([
+        (r"/monitor/(.*)", MonitorSocketHandler),
+        (r"/manage", ManageHandler),
+        (r"/manage/monitors", ManageMonitorsHandler),
+        (r"/manage/monitor/(.*)/reload", ManageMonitorReloadHandler),
+        (r"/manage/monitor/(.*)", ManageMonitorHandler),
+        (r"/status", StatusHandler),
+    ], template_path="templates")
+
+    application.listen(int(config.port))
+    IOLoop.instance().start()
+
+if __name__ == '__main__':
+    main()
