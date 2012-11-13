@@ -13,7 +13,7 @@
     var init = function() {
         connect();
         chrome.tabs.onRemoved.addListener(function(tabId) {
-            if (tab.id == tabId) {
+            if (tab && tab.id == tabId) {
                 tab = null;
             }
         });
@@ -39,6 +39,7 @@
 
     var connect = function() {
         ws = new WebSocket(service_url + monitor_name);
+        ws.onmessage = ws_onmessage;
         /* Set up callbacks upon connect (in pollForConnect) */
         pollForConnect();
     };
@@ -76,7 +77,6 @@
 
     var pollForConnect = function() {
         if (ws.readyState == ws.OPEN) {
-            ws.onmessage = ws_onmessage;
             ws.onclose = ws_onclose;
         } else if (ws.readyState == ws.CONNECTING) {
             setTimeout(pollForConnect, 1000);
