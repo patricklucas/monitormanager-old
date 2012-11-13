@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
 from collections import defaultdict
@@ -14,6 +15,8 @@ from tornado.websocket import WebSocketHandler
 from monitormanager import config, model
 from .model import Monitor
 from .weakset import WeakSet
+
+Session = None # Set in main()
 
 monitors = defaultdict(WeakSet)
 
