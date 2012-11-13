@@ -61,7 +61,10 @@ class ManageHandler(BaseRequestHandler):
 class ManageMonitorsHandler(BaseRequestHandler):
 
     def get(self):
-        monitors = [monitor.todict() for monitor in Monitor.getall(self.db)]
+        query = self.db.query(Monitor) \
+            .order_by(Monitor.name)
+
+        monitors = [monitor.todict() for monitor in query]
         self.write({'monitors': monitors})
 
 
