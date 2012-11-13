@@ -5,12 +5,11 @@ try:
 except ImportError:
     import simplejson as json
 
-import tornado.ioloop
+from tornado.ioloop import IOLoop
 from tornado.web import Application, RequestHandler, HTTPError
-import tornado.websocket
+from tornado.websocket import WebSocketHandler
 
 from model import Session, Monitor
-from requesthandler import RequestHandler
 from weakset import WeakSet
 
 monitors = defaultdict(WeakSet)
@@ -20,7 +19,7 @@ def send_to_monitors(monitor_name, message):
         monitor.write_message(message)
 
 
-class MonitorSocketHandler(tornado.websocket.WebSocketHandler):
+class MonitorSocketHandler(WebSocketHandler):
 
     def open(self, monitor_name):
         self._monitor_name = monitor_name
@@ -181,4 +180,4 @@ application = Application([
 ], template_path="templates")
 
 application.listen(8123)
-tornado.ioloop.IOLoop.instance().start()
+IOLoop.instance().start()
