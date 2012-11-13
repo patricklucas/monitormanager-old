@@ -39,7 +39,6 @@ class Monitor(Base):
 
     def todict(self):
         return {
-            'id': self.id,
             'name': self.name,
             'url': self.url,
         }

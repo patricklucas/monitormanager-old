@@ -49,7 +49,6 @@ $(document).ready(function() {
                     });
 
                 tbody.append($("<tr/>")
-                    .append($("<td/>").text(monitor.id))
                     .append($("<td/>").text(monitor.name))
                     .append($("<td/>").append(urlField))
                     .append($("<td/>")
@@ -104,7 +103,6 @@ table#monitors_table tbody input[type="text"] {
     <table border="1" id="monitors_table">
     <thead>
         <tr>
-            <th width="15px">ID</th>
             <th width="150px">Name</th>
             <th width="300px">URL</th>
             <th width="0">Actions</th>
