@@ -20,16 +20,13 @@ class BaseRequestHandler(RequestHandler):
         return self.application.db
 
 
-class BaseWebSocketHandler(WebSocketHandler):
+class MonitorSocketHandler(WebSocketHandler):
+
+    _monitor_name = None
 
     @property
     def db(self):
         return self.application.db
-
-
-class MonitorSocketHandler(BaseWebSocketHandler):
-
-    _monitor_name = None
 
     def open(self, monitor_name):
         self._monitor_name = monitor_name
