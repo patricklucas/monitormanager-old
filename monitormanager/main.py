@@ -16,12 +16,9 @@ from tornado.websocket import WebSocketHandler
 from monitormanager import config, model
 from .model import Monitor
 from .weakset import WeakSet
+from .websocketpublisher import WebSocketPublisher
 
-monitor_dict = defaultdict(WeakSet)
-
-def send_to_monitors(monitor_name, message):
-    for monitor in monitor_dict[monitor_name]:
-        monitor.write_message(message)
+websockets = WebSocketPublisher()
 
 
 class BaseRequestHandler(RequestHandler):
@@ -44,7 +41,7 @@ class MonitorSocketHandler(BaseWebSocketHandler):
 
     def open(self, monitor_name):
         self._monitor_name = monitor_name
-        monitor_dict[self._monitor_name].add(self)
+        websockets.add(monitor_name, self)
 
         monitor = Monitor.get(self.db, monitor_name)
 
@@ -62,9 +59,7 @@ class MonitorSocketHandler(BaseWebSocketHandler):
         pass
 
     def on_close(self):
-        monitor_dict[self._monitor_name].remove(self)
-        if not monitor_dict[self._monitor_name]:
-            del monitor_dict[self._monitor_name]
+        websockets.remove(self._monitor_name, self)
 
 
 class ManageHandler(BaseRequestHandler):
@@ -110,7 +105,7 @@ class ManageMonitorHandler(BaseRequestHandler):
             'url': monitor.url
         })
 
-        send_to_monitors(monitor.name, message)
+        websockets.publish(monitor.name, message)
 
         self.redirect(self.reverse_url("manage_monitor", monitor.name),
             status=303)
@@ -143,7 +138,7 @@ class ManageMonitorHandler(BaseRequestHandler):
             'url': new_monitor.url
         })
 
-        send_to_monitors(new_monitor.name, message)
+        websockets.publish(new_monitor.name, message)
 
         self.redirect(self.reverse_url("manage_monitor", new_monitor.name),
             status=303)
@@ -177,7 +172,7 @@ class ManageMonitorReloadHandler(BaseRequestHandler):
             'hard': data['hard']
         })
 
-        send_to_monitors(monitor.name, message)
+        websockets.publish(monitor.name, message)
 
 
 class StatusHandler(BaseRequestHandler):
