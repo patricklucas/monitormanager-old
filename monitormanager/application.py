@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
-try:
-    import json
-except ImportError:
-    import simplejson as json
-
+import simplejson as json
 from sqlalchemy.orm import scoped_session, sessionmaker
 from tornado.web import Application, RequestHandler, HTTPError, URLSpec
 from tornado.websocket import WebSocketHandler

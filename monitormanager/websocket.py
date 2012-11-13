@@ -1,9 +1,9 @@
+# -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 from collections import defaultdict
 
-try:
-    import json
-except ImportError:
-    import simplejson as json
+import simplejson as json
 
 from .weakset import WeakSet
 
