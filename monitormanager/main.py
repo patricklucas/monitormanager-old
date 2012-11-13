@@ -17,10 +17,10 @@ from monitormanager import config, model
 from .model import Monitor
 from .weakset import WeakSet
 
-monitors = defaultdict(WeakSet)
+monitor_dict = defaultdict(WeakSet)
 
 def send_to_monitors(monitor_name, message):
-    for monitor in monitors[monitor_name]:
+    for monitor in monitor_dict[monitor_name]:
         monitor.write_message(message)
 
 
@@ -40,9 +40,11 @@ class BaseWebSocketHandler(WebSocketHandler):
 
 class MonitorSocketHandler(BaseWebSocketHandler):
 
+    _monitor_name = None
+
     def open(self, monitor_name):
         self._monitor_name = monitor_name
-        monitors[self._monitor_name].add(self)
+        monitor_dict[self._monitor_name].add(self)
 
         monitor = Monitor.get(self.db, monitor_name)
 
@@ -60,9 +62,9 @@ class MonitorSocketHandler(BaseWebSocketHandler):
         pass
 
     def on_close(self):
-        monitors[self._monitor_name].remove(self)
-        if not monitors[self._monitor_name]:
-            del monitors[self._monitor_name]
+        monitor_dict[self._monitor_name].remove(self)
+        if not monitor_dict[self._monitor_name]:
+            del monitor_dict[self._monitor_name]
 
 
 class ManageHandler(BaseRequestHandler):
