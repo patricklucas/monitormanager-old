@@ -8,7 +8,7 @@ except ImportError:
     import simplejson as json
 
 from tornado.ioloop import IOLoop
-from tornado.web import Application, RequestHandler, HTTPError
+from tornado.web import Application, RequestHandler, HTTPError, URLSpec
 from tornado.websocket import WebSocketHandler
 
 from monitormanager import config, model
@@ -98,7 +98,8 @@ class ManageMonitorHandler(RequestHandler):
 
         send_to_monitors(monitor.name, message)
 
-        self.redirect("/manage/monitor/%s" % monitor.name, status=303)
+        self.redirect(self.reverse_url("manage_monitor", monitor.name),
+            status=303)
 
     def put(self, monitor_name):
         session = Session()
@@ -131,7 +132,8 @@ class ManageMonitorHandler(RequestHandler):
 
         send_to_monitors(new_monitor.name, message)
 
-        self.redirect("/manage/monitor/%s" % new_monitor.name, status=303)
+        self.redirect(self.reverse_url("manage_monitor", new_monitor.name),
+            status=303)
 
 
     def delete(self, monitor_name):
@@ -173,6 +175,12 @@ class StatusHandler(RequestHandler):
         self.write('yep')
 
 
+class RootHandler(RequestHandler):
+
+    def get(self):
+        self.redirect(self.reverse_url("manage"))
+
+
 def main():
     config.load("config.yaml")
     model.init_db()
@@ -183,11 +191,13 @@ def main():
 
     application = Application([
         (r"/monitor/(.*)", MonitorSocketHandler),
-        (r"/manage", ManageHandler),
+        URLSpec(r"/manage", ManageHandler, name="manage"),
         (r"/manage/monitors", ManageMonitorsHandler),
         (r"/manage/monitor/(.*)/reload", ManageMonitorReloadHandler),
-        (r"/manage/monitor/(.*)", ManageMonitorHandler),
+        URLSpec(r"/manage/monitor/(.*)", ManageMonitorHandler,
+            name="manage_monitor"),
         (r"/status", StatusHandler),
+        (r"/", RootHandler),
     ], template_path="templates")
 
     application.listen(int(config.port))
