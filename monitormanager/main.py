@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
-from collections import defaultdict
-
 try:
     import json
 except ImportError:
@@ -15,10 +13,9 @@ from tornado.websocket import WebSocketHandler
 
 from monitormanager import config, model
 from .model import Monitor
-from .weakset import WeakSet
-from .websocketpublisher import WebSocketPublisher
+from .websocket import reload_message, url_message, Publisher
 
-websockets = WebSocketPublisher()
+websockets = Publisher()
 
 
 class BaseRequestHandler(RequestHandler):
@@ -48,12 +45,7 @@ class MonitorSocketHandler(BaseWebSocketHandler):
         if not monitor:
             return
 
-        message = json.dumps({
-            'action': "url",
-            'url': monitor.url
-        })
-
-        self.write_message(message)
+        self.write_message(url_message(monitor.url))
 
     def on_message(self, message):
         pass
@@ -100,12 +92,7 @@ class ManageMonitorHandler(BaseRequestHandler):
 
         self.db.commit()
 
-        message = json.dumps({
-            'action': "url",
-            'url': monitor.url
-        })
-
-        websockets.publish(monitor.name, message)
+        websockets.publish(monitor.name, url_message(monitor.url))
 
         self.redirect(self.reverse_url("manage_monitor", monitor.name),
             status=303)
@@ -133,12 +120,7 @@ class ManageMonitorHandler(BaseRequestHandler):
         self.db.add(new_monitor)
         self.db.commit()
 
-        message = json.dumps({
-            'action': "url",
-            'url': new_monitor.url
-        })
-
-        websockets.publish(new_monitor.name, message)
+        websockets.publish(new_monitor.name, url_message(new_monitor.url))
 
         self.redirect(self.reverse_url("manage_monitor", new_monitor.name),
             status=303)
@@ -167,12 +149,7 @@ class ManageMonitorReloadHandler(BaseRequestHandler):
         if 'hard' not in data:
             raise HTTPError(400)
 
-        message = json.dumps({
-            'action': "reload",
-            'hard': data['hard']
-        })
-
-        websockets.publish(monitor.name, message)
+        websockets.publish(monitor.name, reload_message(data['hard']))
 
 
 class StatusHandler(BaseRequestHandler):

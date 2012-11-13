@@ -1,9 +1,26 @@
-from collections import defaultdict
+from collections import defaultdict, namedtuple
+
+try:
+    import json
+except ImportError:
+    import simplejson as json
 
 from .weakset import WeakSet
 
+def reload_message(hard=False):
+    return json.dumps({
+        'action': "reload",
+        'hard': hard,
+    })
 
-class WebSocketPublisher(object):
+def url_message(url):
+    return json.dumps({
+        'action': "url",
+        'url': url,
+    })
+
+
+class Publisher(object):
 
     def __init__(self):
         self._clients = defaultdict(WeakSet)
