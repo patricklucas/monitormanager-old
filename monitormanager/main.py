@@ -8,6 +8,7 @@ try:
 except ImportError:
     import simplejson as json
 
+from sqlalchemy.orm import scoped_session, sessionmaker
 from tornado.ioloop import IOLoop
 from tornado.web import Application, RequestHandler, HTTPError, URLSpec
 from tornado.websocket import WebSocketHandler
@@ -16,8 +17,6 @@ from monitormanager import config, model
 from .model import Monitor
 from .weakset import WeakSet
 
-Session = None # Set in main()
-
 monitors = defaultdict(WeakSet)
 
 def send_to_monitors(monitor_name, message):
@@ -25,14 +24,27 @@ def send_to_monitors(monitor_name, message):
         monitor.write_message(message)
 
 
-class MonitorSocketHandler(WebSocketHandler):
+class BaseRequestHandler(RequestHandler):
+
+    @property
+    def db(self):
+        return self.application.db
+
+
+class BaseWebSocketHandler(WebSocketHandler):
+
+    @property
+    def db(self):
+        return self.application.db
+
+
+class MonitorSocketHandler(BaseWebSocketHandler):
 
     def open(self, monitor_name):
         self._monitor_name = monitor_name
         monitors[self._monitor_name].add(self)
 
-        session = Session()
-        monitor = Monitor.get(session, monitor_name)
+        monitor = Monitor.get(self.db, monitor_name)
 
         if not monitor:
             return
@@ -53,25 +65,23 @@ class MonitorSocketHandler(WebSocketHandler):
             del monitors[self._monitor_name]
 
 
-class ManageHandler(RequestHandler):
+class ManageHandler(BaseRequestHandler):
 
     def get(self):
         self.render("manage.html")
 
 
-class ManageMonitorsHandler(RequestHandler):
+class ManageMonitorsHandler(BaseRequestHandler):
 
     def get(self):
-        session = Session()
-        monitors = [monitor.todict() for monitor in Monitor.getall(session)]
+        monitors = [monitor.todict() for monitor in Monitor.getall(self.db)]
         self.write({'monitors': monitors})
 
 
-class ManageMonitorHandler(RequestHandler):
+class ManageMonitorHandler(BaseRequestHandler):
 
     def get(self, monitor_name):
-        session = Session()
-        monitor = Monitor.get(session, monitor_name)
+        monitor = Monitor.get(self.db, monitor_name)
 
         if not monitor:
             raise HTTPError(404)
@@ -79,8 +89,7 @@ class ManageMonitorHandler(RequestHandler):
         self.write(monitor.todict())
 
     def post(self, monitor_name):
-        session = Session()
-        monitor = Monitor.get(session, monitor_name)
+        monitor = Monitor.get(self.db, monitor_name)
 
         if not monitor:
             raise HTTPError(404)
@@ -92,7 +101,7 @@ class ManageMonitorHandler(RequestHandler):
 
         monitor.url = data['url']
 
-        session.commit()
+        self.db.commit()
 
         message = json.dumps({
             'action': "url",
@@ -105,8 +114,7 @@ class ManageMonitorHandler(RequestHandler):
             status=303)
 
     def put(self, monitor_name):
-        session = Session()
-        monitor = Monitor.get(session, monitor_name)
+        monitor = Monitor.get(self.db, monitor_name)
 
         if monitor:
             raise HTTPError(400)
@@ -125,8 +133,8 @@ class ManageMonitorHandler(RequestHandler):
             url=data['url'],
         )
 
-        session.add(new_monitor)
-        session.commit()
+        self.db.add(new_monitor)
+        self.db.commit()
 
         message = json.dumps({
             'action': "url",
@@ -140,21 +148,19 @@ class ManageMonitorHandler(RequestHandler):
 
 
     def delete(self, monitor_name):
-        session = Session()
-        deleted = Monitor.delete(session, monitor_name)
+        deleted = Monitor.delete(self.db, monitor_name)
 
         if not deleted:
-            session.rollback()
+            self.db.rollback()
             raise HTTPError(404)
 
-        session.commit()
+        self.db.commit()
 
 
-class ManageMonitorReloadHandler(RequestHandler):
+class ManageMonitorReloadHandler(BaseRequestHandler):
 
     def post(self, monitor_name):
-        session = Session()
-        monitor = Monitor.get(session, monitor_name)
+        monitor = Monitor.get(self.db, monitor_name)
 
         if not monitor:
             raise HTTPError(404)
@@ -172,38 +178,48 @@ class ManageMonitorReloadHandler(RequestHandler):
         send_to_monitors(monitor.name, message)
 
 
-class StatusHandler(RequestHandler):
+class StatusHandler(BaseRequestHandler):
 
     def get(self):
         self.write('yep')
 
 
-class RootHandler(RequestHandler):
+class RootHandler(BaseRequestHandler):
 
     def get(self):
         self.redirect(self.reverse_url("manage"))
 
 
+class MonitorManagerApplication(Application):
+
+    def __init__(self, engine):
+        handlers = [
+            (r"/monitor/(.*)", MonitorSocketHandler),
+            URLSpec(r"/manage", ManageHandler, name="manage"),
+            (r"/manage/monitors", ManageMonitorsHandler),
+            (r"/manage/monitor/(.*)/reload", ManageMonitorReloadHandler),
+            URLSpec(r"/manage/monitor/(.*)", ManageMonitorHandler,
+                name="manage_monitor"),
+            (r"/status", StatusHandler),
+            (r"/", RootHandler),
+        ]
+
+        settings = {
+            'template_path': "templates"
+        }
+
+        super(MonitorManagerApplication, self).__init__(handlers, **settings)
+
+        self.db = scoped_session(sessionmaker(bind=engine))
+
 def main():
     config.load("config.yaml")
-    model.init_db()
 
-    # TODO: is there a better way than this?
-    global Session
-    from .model import Session
+    engine = model.init_db()
 
-    application = Application([
-        (r"/monitor/(.*)", MonitorSocketHandler),
-        URLSpec(r"/manage", ManageHandler, name="manage"),
-        (r"/manage/monitors", ManageMonitorsHandler),
-        (r"/manage/monitor/(.*)/reload", ManageMonitorReloadHandler),
-        URLSpec(r"/manage/monitor/(.*)", ManageMonitorHandler,
-            name="manage_monitor"),
-        (r"/status", StatusHandler),
-        (r"/", RootHandler),
-    ], template_path="templates")
-
+    application = MonitorManagerApplication(engine)
     application.listen(int(config.port))
+
     IOLoop.instance().start()
 
 if __name__ == '__main__':

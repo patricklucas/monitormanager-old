@@ -49,16 +49,11 @@ class Monitor(Base):
         return "<Monitor(%s %s)>" % (self.name, self.url)
 
 
-engine = None
-Session = None
-
 def init_db():
-    global engine, Session
-    engine = create_engine(unicode(config.db_uri))
-    Session = sessionmaker(bind=engine)
+    return create_engine(unicode(config.db_uri))
 
 if __name__ == '__main__':
     # Run python -m monitormanager.model to initialize the database
     config.load("config.yaml")
-    init_db()
+    engine = init_db()
     Base.metadata.create_all(engine)
