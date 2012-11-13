@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import
 
+import time
+
 import simplejson as json
 from sqlalchemy.orm import scoped_session, sessionmaker
 from tornado.web import Application, RequestHandler, HTTPError, URLSpec
@@ -8,7 +10,10 @@ from tornado.websocket import WebSocketHandler
 
 from monitormanager import config
 from .model import Monitor
+from .version import VERSION
 from .websocket import reload_message, url_message, WebSocketStore
+
+UPTIME_REF = time.time()
 
 websockets = WebSocketStore()
 
@@ -155,8 +160,31 @@ class ManageMonitorReloadHandler(BaseRequestHandler):
 
 class StatusHandler(BaseRequestHandler):
 
+    def __init__(self, *args, **kwargs):
+        self.page = kwargs.pop('page', None)
+        super(StatusHandler, self).__init__(*args, **kwargs)
+
     def get(self):
-        self.write('yep')
+        if self.page == 'version':
+            self.set_header('Content-Type', 'text/plain')
+            self.write(unicode(VERSION))
+        else:
+            try:
+                self.db.query("1").first() # Force a db access
+            except:
+                status_ok = False
+            else:
+                status_ok = True
+
+            if self.page == 'healthcheck':
+                if not status_ok:
+                    raise HTTPError(500)
+            else:
+                self.write({
+                    'status': "ok" if status_ok else "error",
+                    'uptime': time.time() - UPTIME_REF,
+                    'version': VERSION
+                })
 
 
 class RootHandler(BaseRequestHandler):
@@ -176,6 +204,8 @@ class MonitorManagerApplication(Application):
             URLSpec(r"/manage/monitor/(.*)", ManageMonitorHandler,
                 name="manage_monitor"),
             (r"/status", StatusHandler),
+            (r"/status/version", StatusHandler, {'page': 'version'}),
+            (r"/status/healthcheck", StatusHandler, {'page': 'healthcheck'}),
             (r"/", RootHandler),
         ]
 
