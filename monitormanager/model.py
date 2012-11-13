@@ -50,8 +50,11 @@ class Monitor(Base):
 def init_db():
     return create_engine(unicode(config.db_uri))
 
-if __name__ == '__main__':
-    # Run python -m monitormanager.model to initialize the database
+def main():
+    """Run python -m monitormanager.model to initialize the database"""
     config.load("config.yaml")
     engine = init_db()
     Base.metadata.create_all(engine)
+
+if __name__ == '__main__':
+    main()
