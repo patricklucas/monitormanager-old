@@ -1,2 +1,3 @@
 port: 8123
 db_uri: "sqlite:////nail/tmp/monitormanager.db"
+# debug: false

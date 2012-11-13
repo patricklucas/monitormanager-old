@@ -10,6 +10,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from tornado.web import Application, RequestHandler, HTTPError, URLSpec
 from tornado.websocket import WebSocketHandler
 
+from monitormanager import config
 from .model import Monitor
 from .websocket import reload_message, url_message, Publisher
 
@@ -187,6 +188,7 @@ class MonitorManagerApplication(Application):
 
         settings = {
             'template_path': "templates",
+            'debug': config.debug,
         }
 
         super(MonitorManagerApplication, self).__init__(handlers, **settings)
