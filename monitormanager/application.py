@@ -180,7 +180,7 @@ class MonitorManagerApplication(Application):
         ]
 
         settings = {
-            'template_path': "templates",
+            'template_path': unicode(config.template_path),
             'debug': config.debug,
         }
 
