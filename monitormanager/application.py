@@ -8,9 +8,9 @@ from tornado.websocket import WebSocketHandler
 
 from monitormanager import config
 from .model import Monitor
-from .websocket import reload_message, url_message, Publisher
+from .websocket import reload_message, url_message, WebSocketStore
 
-websockets = Publisher()
+websockets = WebSocketStore()
 
 
 class BaseRequestHandler(RequestHandler):

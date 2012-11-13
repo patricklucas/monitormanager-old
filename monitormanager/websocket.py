@@ -20,7 +20,7 @@ def url_message(url):
     })
 
 
-class Publisher(object):
+class WebSocketStore(object):
 
     def __init__(self):
         self._clients = defaultdict(WeakSet)
