@@ -94,11 +94,9 @@
 
         if (enabled) {
             connect();
-            console.log("ENABLED");
         } else {
             ws.close();
             ws = null;
-            console.log("DISABLED");
         }
     };
 
