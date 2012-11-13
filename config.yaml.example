@@ -1,3 +1,3 @@
+bind_ip: "monitormanager.example.com"
 port: 8123
-db_uri: "sqlite:////nail/tmp/monitormanager.db"
-# debug: false
+db_uri: "sqlite:////tmp/monitormanager.db"

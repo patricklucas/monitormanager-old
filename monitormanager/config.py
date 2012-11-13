@@ -3,7 +3,8 @@ from __future__ import absolute_import
 
 import staticconf
 
-port = staticconf.get_int('port')
+address = staticconf.get_string('address', "")
+port = staticconf.get_int('port', 8123)
 db_uri = staticconf.get_string('db_uri')
 debug = staticconf.get_bool('debug', False)
 
