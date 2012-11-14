@@ -13,7 +13,7 @@ dir="$1"
 key="$2"
 
 if [ -z "$key" ]; then
-    key="$name.key"
+    key="$name.pem"
     openssl genrsa -out "$key" 2048 2> /dev/null
 fi
 

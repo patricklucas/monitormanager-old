@@ -4,7 +4,7 @@ NAME=monitormanager
 
 CHROMESRC=chrome/
 CHROMEEXT=$(NAME).crx
-CHROMEKEY=$(NAME).key
+CHROMEKEY=$(NAME).pem
 
 PYTHONSRC=$(NAME)/
 PYTHONBUILD=build/
