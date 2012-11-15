@@ -103,6 +103,8 @@
         this.init();
     };
 
+    window.tabses = {};
+
     var bar = new MonitorTab();
     var foo = bar.socket;
 
@@ -161,6 +163,7 @@
 
         chrome.tabs.create({url: foo.monitor_url}, function(newTab) {
             bar.tab = newTab;
+            window.tabses[bar.tab.id] = bar.tab;
         });
     };
 

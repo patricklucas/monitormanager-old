@@ -20,14 +20,12 @@
             getEl('disable_check').checked = !bg.mm_isEnabled();
             getEl('monitor_name').value = bg.mm_getName();
             getEl('service_url').value = bg.mm_getServiceUrl();
-            getEl('open_monitor_tab').disabled = bg.mm_isTabOpen();
         },
 
         initEvents: function() {
             initEvent('disable_check', 'change', this.disableEvent);
             initEvent('monitor_name_save', 'click', this.changeNameEvent);
             initEvent('service_url_save', 'click', this.changeServiceUrlEvent);
-            initEvent('open_monitor_tab', 'click', this.openMonitorTabEvent);
         },
 
         disableEvent: function(e) {
@@ -43,16 +41,35 @@
             var newServiceUrl = getEl('service_url').value;
             bg.mm_setServiceUrl(newServiceUrl);
         },
-
-        openMonitorTabEvent: function(e) {
-            bg.mm_openTab();
-            e.srcElement.disabled = true;
-        }
-
     });
 
+    var initOpenButton = function() {
+        initEvent('open_monitor_tab', 'click', function(e) {
+            bg.mm_openTab();
+            e.srcElement.disabled = true;
+        });
+    };
+
     document.addEventListener('DOMContentLoaded', function () {
-        tabctl = new TabControl();
+        var tabctl;
+
+        chrome.tabs.query({
+            currentWindow: true,
+            active: true
+        }, function(tabs) {
+            if (tabs.length != 1) {
+                console.log("Well this is awkward.");
+                return;
+            }
+
+            var tab = tabs[0];
+
+            if (tab.id in bg.tabses) {
+                var tabctl = new TabControl(tab);
+            };
+        });
+
+        initOpenButton();
     });
 
 })();
