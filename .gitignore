@@ -1,5 +1,7 @@
 .*.swp
 config.yaml
+
 /build
+/chrome-build
 /*.crx
 /*.pem
