@@ -1,29 +1,26 @@
 (function() {
 
-    var TabControl = function() {
+    var TabSocket = function(options) {
         // Refs
         this.ws = null;
         this.tab = null;
 
         // State
-        this.enabled = true;
-        this.service_url = "ws://localhost:8123/monitor/";
-        this.monitor_name = "default";
-        this.monitor_url = "about:blank";
+        this.enabled = options && options.enabled || true;
+        this.service_url = options && options.service_url || "ws://localhost:8123/monitor/";
+        this.monitor_name = options && options.monitor_name || "InfraTopLeft";
+        this.monitor_url = options && options.monitor_url || "about:blank";
+
+        // Callbacks
+        this.onmessage = options && options.onmessage;
 
         this.init = function() {
-            chrome.tabs.onRemoved.addListener(function(tabId) {
-                if (this.tab && this.tab.id == tabId) {
-                    this.tab = null;
-                }
-            });
-
             this.connect();
         };
 
         this.connect = function() {
             this.ws = new WebSocket(this.service_url + this.monitor_name);
-            this.ws.onmessage = this.ws_onmessage.bind(this);
+            this.ws.onmessage = this.onmessage.bind(this);
             this.pollForConnect();
         };
 
@@ -50,6 +47,26 @@
             }.bind(this), 1000);
         };
 
+        this.init();
+    };
+
+    var MonitorTab = function() {
+        this.socket = null;
+        this.tab = null;
+
+        this.init = function() {
+            chrome.tabs.onRemoved.addListener(function(tabId) {
+                if (this.tab && this.tab.id == tabId) {
+                    delete window.tabses[this.tab.id];
+                    this.tab = null;
+                }
+            });
+
+            this.socket = new TabSocket({
+                onmessage: this.onmessage.bind(this)
+            });
+        };
+
         this.actionReload = function(hard) {
             if (!this.tab) {
                 return;
@@ -68,7 +85,7 @@
             chrome.tabs.update(this.tab.id, {url: url});
         };
 
-        this.ws_onmessage = function(e) {
+        this.onmessage = function(e) {
             var data = JSON.parse(e.data);
 
             switch (data.action) {
@@ -86,7 +103,8 @@
         this.init();
     };
 
-    var foo = new TabControl();
+    var bar = new MonitorTab();
+    var foo = bar.socket;
 
     window.mm_isEnabled = function() {
         return foo.enabled;
@@ -132,17 +150,17 @@
     };
 
     window.mm_isTabOpen = function() {
-        return !!foo.tab;
+        return !!bar.tab;
     };
 
     // Time for some drinks
     window.mm_openTab = function() {
-        if (foo.tab) {
+        if (bar.tab) {
             return;
         }
 
         chrome.tabs.create({url: foo.monitor_url}, function(newTab) {
-            foo.tab = newTab;
+            bar.tab = newTab;
         });
     };
 
