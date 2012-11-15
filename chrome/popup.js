@@ -11,35 +11,37 @@
 
     var TabControl = Backbone.Model.extend({
 
-        initialize: function() {
+        initialize: function(monTab) {
+            this.monTab = monTab;
             this.initFormFields();
             this.initEvents();
         },
 
         initFormFields: function() {
-            getEl('disable_check').checked = !bg.mm_isEnabled();
-            getEl('monitor_name').value = bg.mm_getName();
-            getEl('service_url').value = bg.mm_getServiceUrl();
+            console.log(this.monTab);
+            getEl('disable_check').checked = !this.monTab.isEnabled();
+            getEl('monitor_name').value = this.monTab.getName();
+            getEl('service_url').value = this.monTab.getServiceUrl();
         },
 
         initEvents: function() {
-            initEvent('disable_check', 'change', this.disableEvent);
-            initEvent('monitor_name_save', 'click', this.changeNameEvent);
-            initEvent('service_url_save', 'click', this.changeServiceUrlEvent);
+            initEvent('disable_check', 'change', this.disableEvent.bind(this));
+            initEvent('monitor_name_save', 'click', this.changeNameEvent.bind(this));
+            initEvent('service_url_save', 'click', this.changeServiceUrlEvent.bind(this));
         },
 
         disableEvent: function(e) {
-            bg.mm_enable(!e.srcElement.checked);
+            this.monTab.enable(!e.srcElement.checked);
         },
 
         changeNameEvent: function() {
             var newName = getEl('monitor_name').value;
-            bg.mm_setName(newName);
+            this.monTab.setName(newName);
         },
 
         changeServiceUrlEvent: function() {
             var newServiceUrl = getEl('service_url').value;
-            bg.mm_setServiceUrl(newServiceUrl);
+            this.monTab.setServiceUrl(newServiceUrl);
         },
     });
 
@@ -65,7 +67,7 @@
             var tab = tabs[0];
 
             if (tab.id in bg.tabses) {
-                var tabctl = new TabControl(tab);
+                var tabctl = new TabControl(bg.tabses[tab.id]);
             };
         });
 

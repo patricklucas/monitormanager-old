@@ -100,70 +100,65 @@
             };
         };
 
+        this.isEnabled = function() {
+            return this.socket.enabled;
+        };
+
+        this.enable = function(enable) {
+            enable = !!enable;
+
+            if (this.socket.enabled === enable) {
+                return;
+            };
+
+            if (enable) {
+                this.socket.enabled = true;
+                this.socket.connect();
+            } else {
+                this.socket.enabled = false;
+                this.socket.ws.close();
+                this.socket.ws = null;
+            }
+        };
+
+        this.getServiceUrl = function() {
+            return this.socket.service_url;
+        };
+
+        this.setServiceUrl = function(url) {
+            this.socket.service_url = url;
+            this.socket.reconnect();
+        };
+
+        this.getName = function() {
+            return this.socket.monitor_name;
+        };
+
+        this.setName = function(name) {
+            if (!name) {
+                return false;
+            }
+
+            this.socket.monitor_name = name;
+            this.socket.reconnect();
+        };
+
+        this.isTabOpen = function() {
+            return !!bar.tab;
+        };
+
         this.init();
     };
 
     window.tabses = {};
 
-    var bar = new MonitorTab();
-    var foo = bar.socket;
-
-    window.mm_isEnabled = function() {
-        return foo.enabled;
-    };
-
-    window.mm_enable = function(enable) {
-        enable = !!enable;
-
-        if (foo.enabled === enable) {
-            return;
-        };
-
-        if (enable) {
-            foo.enabled = true;
-            foo.connect();
-        } else {
-            foo.enabled = false;
-            foo.ws.close();
-            foo.ws = null;
-        }
-    };
-
-    window.mm_getServiceUrl = function() {
-        return foo.service_url;
-    };
-
-    window.mm_setServiceUrl = function(url) {
-        foo.service_url = url;
-        foo.reconnect();
-    };
-
-    window.mm_getName = function() {
-        return foo.monitor_name;
-    };
-
-    window.mm_setName = function(name) {
-        if (!name) {
-            return false;
-        }
-
-        foo.monitor_name = name;
-        foo.reconnect();
-    };
-
-    window.mm_isTabOpen = function() {
-        return !!bar.tab;
-    };
-
     // Time for some drinks
     window.mm_openTab = function() {
-        if (bar.tab) {
-            return;
-        }
+        var monTab = new MonitorTab();
 
-        chrome.tabs.create({url: foo.monitor_url}, function(newTab) {
-            bar.tab = newTab;
-            window.tabses[bar.tab.id] = bar.tab;
+        chrome.tabs.create({url: monTab.socket.monitor_url}, function(newTab) {
+            monTab.tab = newTab;
+            window.tabses[newTab.id] = monTab;
         });
     };
 
