@@ -1,116 +1,125 @@
 (function() {
 
-    // Refs
-    var ws,
-        tab;
+    var TabControl = function() {
+        // Refs
+        this.ws = null;
+        this.tab = null;
 
-    // State
-    var enabled = true,
-        service_url = "ws://localhost:8123/monitor/";
-        monitor_name = "default",
-        monitor_url = "about:blank";
+        // State
+        this.enabled = true;
+        this.service_url = "ws://localhost:8123/monitor/";
+        this.monitor_name = "default";
+        this.monitor_url = "about:blank";
 
-    var init = function() {
-        connect();
-        chrome.tabs.onRemoved.addListener(function(tabId) {
-            if (tab && tab.id == tabId) {
-                tab = null;
-            }
-        });
-    };
+        this.init = function() {
+            chrome.tabs.onRemoved.addListener(function(tabId) {
+                if (this.tab && this.tab.id == tabId) {
+                    this.tab = null;
+                }
+            });
 
-    var actionReload = function(hard) {
-        if (!tab) {
-            return;
-        }
-
-        chrome.tabs.reload(tab.id, {bypassCache: hard});
-    };
-
-    var actionUrl = function(url) {
-        monitor_url = url;
-
-        if (!tab) {
-            return;
-        }
-
-        chrome.tabs.update(tab.id, {url: url});
-    };
-
-    var connect = function() {
-        ws = new WebSocket(service_url + monitor_name);
-        ws.onmessage = ws_onmessage;
-        /* Set up callbacks upon connect (in pollForConnect) */
-        pollForConnect();
-    };
-
-    var ws_onmessage = function(e) {
-        var data = JSON.parse(e.data);
-
-        switch (data.action) {
-        case 'reload':
-            actionReload(data.hard);
-            break;
-        case 'url':
-            actionUrl(data.url);
-            break;
-        default:
-            console.log("Unknown action: " + data.action);
+            this.connect();
         };
+
+        this.connect = function() {
+            this.ws = new WebSocket(this.service_url + this.monitor_name);
+            this.ws.onmessage = this.ws_onmessage.bind(this);
+            this.pollForConnect();
+        };
+
+        this.reconnect = function() {
+            this.ws.onclose = null; // Disable the reconnecting onclose handler
+            this.ws.close();
+            this.connect();
+        };
+
+        this.pollForConnect = function() {
+            setTimeout(function() {
+                var state = this.ws.readyState;
+                if (state == WebSocket.OPEN) {
+                    this.ws.onclose = function() {
+                        if (this.enabled) {
+                            this.connect();
+                        }
+                    }.bind(this);
+                } else if (state == WebSocket.CONNECTING) {
+                    this.pollForConnect();
+                } else { // CLOSED or CLOSING
+                    this.connect();
+                }
+            }.bind(this), 1000);
+        };
+
+        this.actionReload = function(hard) {
+            if (!this.tab) {
+                return;
+            }
+
+            chrome.tabs.reload(this.tab.id, {bypassCache: hard});
+        };
+
+        this.actionUrl = function(url) {
+            this.monitor_url = url;
+
+            if (!this.tab) {
+                return;
+            }
+
+            chrome.tabs.update(this.tab.id, {url: url});
+        };
+
+        this.ws_onmessage = function(e) {
+            var data = JSON.parse(e.data);
+
+            switch (data.action) {
+            case 'reload':
+                this.actionReload(data.hard);
+                break;
+            case 'url':
+                this.actionUrl(data.url);
+                break;
+            default:
+                console.log("Unknown action: " + data.action);
+            };
+        };
+
+        this.init();
     };
 
-    var ws_onclose = function() {
-        if (enabled) {
-            setTimeout(tryReconnect, 1000);
-        }
-    }
-
-    var reconnect = function() {
-        ws.onclose = null; // Disable the reconnecting onclose handler
-        ws.close();
-        connect();
-    };
-
-    var tryReconnect = function() {
-        connect();
-    };
-
-    var pollForConnect = function() {
-        if (ws.readyState == ws.OPEN) {
-            ws.onclose = ws_onclose;
-        } else if (ws.readyState == ws.CONNECTING) {
-            setTimeout(pollForConnect, 1000);
-        } else { // CLOSED or CLOSING
-            setTimeout(tryReconnect, 1000);
-        }
-    };
+    var foo = new TabControl();
 
     window.mm_isEnabled = function() {
-        return enabled;
+        return foo.enabled;
     };
 
     window.mm_enable = function(enable) {
-        enabled = !!enable;
+        enable = !!enable;
 
-        if (enabled) {
-            connect();
+        if (foo.enabled === enable) {
+            return;
+        };
+
+        if (enable) {
+            foo.enabled = true;
+            foo.connect();
         } else {
-            ws.close();
-            ws = null;
+            foo.enabled = false;
+            foo.ws.close();
+            foo.ws = null;
         }
     };
 
     window.mm_getServiceUrl = function() {
-        return service_url;
+        return foo.service_url;
     };
 
     window.mm_setServiceUrl = function(url) {
-        service_url = url;
-        reconnect();
+        foo.service_url = url;
+        foo.reconnect();
     };
 
     window.mm_getName = function() {
-        return monitor_name;
+        return foo.monitor_name;
     };
 
     window.mm_setName = function(name) {
@@ -118,25 +127,23 @@
             return false;
         }
 
-        monitor_name = name;
-        reconnect();
+        foo.monitor_name = name;
+        foo.reconnect();
     };
 
-    window.mm_isTabOpen = function(callback) {
-        return !!tab;
+    window.mm_isTabOpen = function() {
+        return !!foo.tab;
     };
 
     // Time for some drinks
     window.mm_openTab = function() {
-        if (tab) {
+        if (foo.tab) {
             return;
         }
 
-        chrome.tabs.create({url: monitor_url}, function(newTab) {
-            tab = newTab;
+        chrome.tabs.create({url: foo.monitor_url}, function(newTab) {
+            foo.tab = newTab;
         });
     };
-
-    init();
 
 })();
