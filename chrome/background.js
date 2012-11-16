@@ -15,8 +15,8 @@
 
         enabled = enable;
 
-        for (tab in monitorTabs) {
-            monitorTabs[tab].setEnabled(enabled);
+        for (tabId in monitorTabs) {
+            monitorTabs[tabId].setEnabled(enabled);
         }
     };
 
@@ -25,8 +25,8 @@
     };
 
     mm.setServiceNetloc = function(netloc) {
-        for (tab in monitorTabs) {
-            monitorTabs[tab].setServiceNetloc(netloc);
+        for (tabId in monitorTabs) {
+            monitorTabs[tabId].setServiceNetloc(netloc);
         };
     };
 
