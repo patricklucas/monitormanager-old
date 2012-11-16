@@ -1,10 +1,12 @@
 (function(mm) {
 
-    var MonitorTab = function(options, callback) {
+    var MonitorTab = function(options) {
         this.socket = null;
         this.tab = null;
 
-        this.monitor_url = options.monitor_url;
+        this.options = options;
+
+        this.monitor_url = this.options.monitor_url;
 
         this.init = function() {
             // Don't connect until we have a tab
@@ -13,19 +15,19 @@
 
                 chrome.tabs.onRemoved.addListener(function(tabId) {
                     if (this.tab && this.tab.id == tabId) {
-                        delete monitorTabs[this.tab.id];
+                        this.options.onRemove();
                         this.tab = null;
                     }
                 }.bind(this));
 
                 this.socket = new mm.TabSocket({
-                    enabled: options.enabled,
-                    service_netloc: options.service_netloc,
-                    monitor_name: options.monitor_name,
+                    enabled: this.options.enabled,
+                    service_netloc: this.options.service_netloc,
+                    monitor_name: this.options.monitor_name,
                     onmessage: this.onmessage.bind(this)
                 });
 
-                callback(this.tab.id);
+                this.options.onCreate();
             }.bind(this));
         };
 

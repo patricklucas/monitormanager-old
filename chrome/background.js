@@ -48,9 +48,13 @@
             enabled: enabled,
             service_netloc: service_netloc,
             monitor_name: mm.defaults.monitor_name,
-            monitor_url: mm.defaults.monitor_url
-        }, function(tabId) {
-            monitorTabs[tabId] = tab;
+            monitor_url: mm.defaults.monitor_url,
+            onCreate: function() {
+                monitorTabs[tab.tab.id] = tab;
+            },
+            onRemove: function() {
+                delete monitorTabs[tab.tab.id];
+            }
         });
     };
 
