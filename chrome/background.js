@@ -5,14 +5,15 @@
         this.ws = null;
         this.tab = null;
 
+        options = options || {};
+
         // State
-        this.enabled = options && options.enabled || true;
-        this.service_url = options && options.service_url || "ws://localhost:8123/monitor/";
-        this.monitor_name = options && options.monitor_name || "InfraTopLeft";
-        this.monitor_url = options && options.monitor_url || "about:blank";
+        this.enabled = options.enabled || true;
+        this.service_url = options.service_url || "ws://localhost:8123/monitor/";
+        this.monitor_name = options.monitor_name || "InfraTopLeft";
 
         // Callbacks
-        this.onmessage = options && options.onmessage;
+        this.onmessage = options.onmessage;
 
         this.init = function() {
             this.connect();
@@ -20,7 +21,7 @@
 
         this.connect = function() {
             this.ws = new WebSocket(this.service_url + this.monitor_name);
-            this.ws.onmessage = this.onmessage.bind(this);
+            this.ws.onmessage = this.onmessage;
             this.pollForConnect();
         };
 
@@ -50,21 +51,30 @@
         this.init();
     };
 
-    var MonitorTab = function() {
+    var MonitorTab = function(callback) {
         this.socket = null;
         this.tab = null;
 
-        this.init = function() {
-            chrome.tabs.onRemoved.addListener(function(tabId) {
-                if (this.tab && this.tab.id == tabId) {
-                    delete window.tabses[this.tab.id];
-                    this.tab = null;
-                }
-            });
+        this.monitor_url = "about:blank";
 
-            this.socket = new TabSocket({
-                onmessage: this.onmessage.bind(this)
-            });
+        this.init = function() {
+            // Don't connect until we have a tab
+            chrome.tabs.create({url: this.monitor_url}, function(newTab) {
+                this.tab = newTab;
+
+                chrome.tabs.onRemoved.addListener(function(tabId) {
+                    if (this.tab && this.tab.id == tabId) {
+                        delete monitorTabs[this.tab.id];
+                        this.tab = null;
+                    }
+                }.bind(this));
+
+                this.socket = new TabSocket({
+                    onmessage: this.onmessage.bind(this)
+                });
+
+                callback(this.tab.id);
+            }.bind(this));
         };
 
         this.actionReload = function(hard) {
@@ -150,15 +160,19 @@
         this.init();
     };
 
-    window.tabses = {};
+    var monitorTabs = {};
+
+    window.getMonitorTab = function(tabId) {
+        if (!tabId in monitorTabs)
+            return null;
+
+        return monitorTabs[tabId];
+    };
 
     // Time for some drinks
-    window.mm_openTab = function() {
-        var monTab = new MonitorTab();
-
-        chrome.tabs.create({url: monTab.socket.monitor_url}, function(newTab) {
-            monTab.tab = newTab;
-            window.tabses[newTab.id] = monTab;
+    window.openMonitorTab = function() {
+        var tab = new MonitorTab(function(tabId) {
+            monitorTabs[tabId] = tab;
         });
     };
 

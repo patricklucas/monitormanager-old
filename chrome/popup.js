@@ -47,7 +47,7 @@
 
     var initOpenButton = function() {
         initEvent('open_monitor_tab', 'click', function(e) {
-            bg.mm_openTab();
+            bg.openMonitorTab();
             e.srcElement.disabled = true;
         });
     };
@@ -64,10 +64,10 @@
                 return;
             }
 
-            var tab = tabs[0];
+            var tab = bg.getMonitorTab(tabs[0].id);
 
-            if (tab.id in bg.tabses) {
-                var tabctl = new TabControl(bg.tabses[tab.id]);
+            if (tab) {
+                var tabctl = new TabControl(tab);
             };
         });
 
