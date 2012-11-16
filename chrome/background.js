@@ -9,8 +9,7 @@
 
         // State
         this.enabled = options.enabled || true;
-        this.service_host = options.service_host || "localhost";
-        this.service_port = options.service_port || 8123;
+        this.service_netloc = options.service_netloc || "localhost:8123";
         this.monitor_name = options.monitor_name || "InfraTopLeft";
 
         // Callbacks
@@ -21,8 +20,9 @@
         };
 
         this.service_uri = function() {
-            return "ws://" + this.service_host + ":" + this.service_port +
-                "/monitor/" + this.monitor_name;
+            var netloc = this.service_netloc;
+            var name = this.monitor_name;
+            return "ws://" + netloc + "/monitor/" + name;
         };
 
         this.connect = function() {

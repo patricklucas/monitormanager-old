@@ -21,13 +21,13 @@
             console.log(this.monTab);
             getEl('disable_check').checked = !this.monTab.isEnabled();
             getEl('monitor_name').value = this.monTab.getName();
-            getEl('service_url').value = this.monTab.getServiceUrl();
+            getEl('service_netloc').value = this.monTab.getServiceNetloc();
         },
 
         initEvents: function() {
             initEvent('disable_check', 'change', this.disableEvent.bind(this));
             initEvent('monitor_name_save', 'click', this.changeNameEvent.bind(this));
-            initEvent('service_url_save', 'click', this.changeServiceUrlEvent.bind(this));
+            initEvent('service_netloc_save', 'click', this.changeServiceNetlocEvent.bind(this));
         },
 
         disableEvent: function(e) {
@@ -39,9 +39,9 @@
             this.monTab.setName(newName);
         },
 
-        changeServiceUrlEvent: function() {
-            var newServiceUrl = getEl('service_url').value;
-            this.monTab.setServiceUrl(newServiceUrl);
+        changeServiceNetlocEvent: function() {
+            var newServiceNetloc = getEl('service_netloc').value;
+            this.monTab.setServiceNetloc(newServiceNetloc);
         },
     });
 
