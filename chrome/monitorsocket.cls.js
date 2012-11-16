@@ -1,9 +1,8 @@
 (function(mm) {
 
-    var TabSocket = function(options) {
+    var MonitorSocket = function(options) {
         // Refs
         this.ws = null;
-        this.tab = null;
 
         // State
         this.enabled = options.enabled || true;
@@ -80,6 +79,6 @@
         this.init();
     };
 
-    mm.TabSocket = TabSocket;
+    mm.MonitorSocket = MonitorSocket;
 
 })(window.mm);

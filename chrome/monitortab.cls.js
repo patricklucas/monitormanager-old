@@ -20,7 +20,7 @@
                     }
                 }.bind(this));
 
-                this.socket = new mm.TabSocket({
+                this.socket = new mm.MonitorSocket({
                     enabled: this.options.enabled,
                     service_netloc: this.options.service_netloc,
                     monitor_name: this.options.monitor_name,

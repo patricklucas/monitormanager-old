@@ -10,7 +10,7 @@
     "background": {
         "scripts": [
             "config.js",
-            "tabsocket.cls.js",
+            "monitorsocket.cls.js",
             "monitortab.cls.js",
             "background.js"
         ]
