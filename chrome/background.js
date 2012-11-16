@@ -54,6 +54,45 @@
             }.bind(this), 1000);
         };
 
+        this.isEnabled = function() {
+            return this.enabled;
+        };
+
+        this.enable = function(enable) {
+            enable = !!enable;
+
+            if (this.enabled === enable) {
+                return;
+            };
+
+            if (enable) {
+                this.enabled = true;
+                this.connect();
+            } else {
+                this.enabled = false;
+                this.ws.close();
+                this.ws = null;
+            }
+        };
+
+        this.getServiceNetloc = function() {
+            return this.service_netloc;
+        };
+
+        this.setServiceNetloc = function(netloc) {
+            this.service_netloc = netloc;
+            this.reconnect();
+        };
+
+        this.getName = function() {
+            return this.monitor_name;
+        };
+
+        this.setName = function(name) {
+            this.monitor_name = name;
+            this.reconnect();
+        };
+
         this.init();
     };
 
@@ -117,50 +156,27 @@
         };
 
         this.isEnabled = function() {
-            return this.socket.enabled;
+            return this.socket.isEnabled();
         };
 
         this.enable = function(enable) {
-            enable = !!enable;
-
-            if (this.socket.enabled === enable) {
-                return;
-            };
-
-            if (enable) {
-                this.socket.enabled = true;
-                this.socket.connect();
-            } else {
-                this.socket.enabled = false;
-                this.socket.ws.close();
-                this.socket.ws = null;
-            }
+            return this.socket.enable(enable);
         };
 
-        this.getServiceUrl = function() {
-            return this.socket.service_url;
+        this.getServiceNetloc = function() {
+            return this.socket.getServiceNetloc();
         };
 
-        this.setServiceUrl = function(url) {
-            this.socket.service_url = url;
-            this.socket.reconnect();
+        this.setServiceNetloc = function(netloc) {
+            return this.socket.setServiceNetloc(netloc);
         };
 
         this.getName = function() {
-            return this.socket.monitor_name;
+            return this.socket.getName();
         };
 
         this.setName = function(name) {
-            if (!name) {
-                return false;
-            }
-
-            this.socket.monitor_name = name;
-            this.socket.reconnect();
-        };
-
-        this.isTabOpen = function() {
-            return !!bar.tab;
+            return this.socket.setName(name);
         };
 
         this.init();
