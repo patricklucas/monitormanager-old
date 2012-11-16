@@ -31,11 +31,13 @@ $(document).ready(function() {
 
                 var reloadButton = $("<input type=\"button\"/>")
                     .val("Reload")
-                    .click(function() {
+                    .click(function(e) {
+                        var hard = e.altKey;
+
                         $.ajax({
                             type: 'POST',
                             url: "/manage/monitor/" + monitor.name + "/reload",
-                            data: JSON.stringify({hard: false}),
+                            data: JSON.stringify({hard: hard}),
                             dataType: 'json'
                         });
                     });
