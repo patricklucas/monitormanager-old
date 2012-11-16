@@ -30,19 +30,15 @@
         };
 
         this.actionReload = function(hard) {
-            if (!this.tab) {
-                return;
-            }
-
             chrome.tabs.reload(this.tab.id, {bypassCache: hard});
         };
 
         this.actionUrl = function(url) {
-            this.monitor_url = url;
-
-            if (!this.tab) {
+            if (url == this.monitor_url) {
                 return;
             }
+
+            this.monitor_url = url;
 
             chrome.tabs.update(this.tab.id, {url: url});
         };
