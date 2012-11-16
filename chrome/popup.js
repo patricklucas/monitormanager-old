@@ -9,29 +9,6 @@
         getEl(id).addEventListener(ev, callback);
     };
 
-    var TabControl = Backbone.Model.extend({
-
-        initialize: function(monTab) {
-            this.monTab = monTab;
-            this.initFormFields();
-            this.initEvents();
-        },
-
-        initFormFields: function() {
-            getEl('monitor_name').value = this.monTab.getName();
-        },
-
-        initEvents: function() {
-            initEvent('monitor_name_save', 'click', this.changeNameEvent.bind(this));
-        },
-
-        changeNameEvent: function() {
-            var newName = getEl('monitor_name').value;
-            this.monTab.setName(newName);
-        }
-
-    });
-
     var initOpenButton = function() {
         initEvent('open_monitor_tab', 'click', function(e) {
             mm.openMonitorTab();
@@ -46,7 +23,7 @@
         });
     };
 
-    var initServiceNetlocInput = function() {
+    var initServiceNetlocField = function() {
         getEl('service_netloc').value = mm.getServiceNetloc();
         initEvent('service_netloc_save', 'click', function(e) {
             var newServiceNetloc = getEl('service_netloc').value;
@@ -54,10 +31,19 @@
         });
     };
 
+    var initTabNameField = function(tab) {
+        getEl('taboptions').style.display = 'block';
+        getEl('monitor_name').value = tab.getName();
+        initEvent('monitor_name_save', 'click', function(e) {
+            var newName = getEl('monitor_name').value;
+            tab.setName(newName);
+        });
+    };
+
     document.addEventListener('DOMContentLoaded', function () {
         initOpenButton();
         initDisableCheck();
-        initServiceNetlocInput();
+        initServiceNetlocField();
 
         chrome.tabs.query({
             currentWindow: true,
@@ -71,7 +57,7 @@
             var tab = mm.getMonitorTab(tabs[0].id);
 
             if (tab) {
-                var tabctl = new TabControl(tab);
+                initTabNameField(tab);
             };
         });
     });
