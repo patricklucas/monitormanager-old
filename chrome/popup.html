@@ -8,12 +8,12 @@ html, body {
     font-family: sans-serif;
 }
 
-div#nottaboptions {
-    color: #999;
-}
-
 div#taboptions {
     display: none;
+}
+
+.nocontent {
+    color: #999;
 }
 </style>
 </head>
@@ -33,13 +33,16 @@ div#taboptions {
     <input id="service_netloc_save" type="button" value="save"/>
 </p>
 <h2>Tab Options</h2>
-<div id="nottaboptions">
+<div id="nottaboptions" class="nocontent">
     This is not a monitor tab.
 </div>
 <div id="taboptions">
     <label for="monitor_name">Monitor Name:</label>
     <input id="monitor_name" type="text"/>
     <input id="monitor_name_save" type="button" value="save"/>
+</div>
+<h2>Open Tabs</h2>
+<div id="opentabs">
 </div>
 </body>
 </html>

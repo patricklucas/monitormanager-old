@@ -41,6 +41,23 @@
         });
     };
 
+    var initOpenTabsCount = function() {
+        var count = mm.numOpenMonitorTabs();
+        var opentabs = getEl('opentabs');
+        var text = "";
+
+        if (count == 0) {
+            opentabs.className = "nocontent";
+            text = "There are no open monitor tabs.";
+        } else if (count == 1) {
+            text = "There is " + count + " open monitor tab.";
+        } else {
+            text = "There are " + count + " open monitor tabs.";
+        }
+
+        opentabs.innerText = text;
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         initOpenButton();
         initDisableCheck();
@@ -61,6 +78,8 @@
                 initTabNameField(tab);
             };
         });
+
+        initOpenTabsCount();
     });
 
 })();

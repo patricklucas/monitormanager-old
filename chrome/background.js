@@ -38,6 +38,10 @@
         return monitorTabs[tabId];
     };
 
+    mm.numOpenMonitorTabs = function() {
+        return Object.keys(monitorTabs).length;
+    };
+
     // Time for some drinks
     mm.openMonitorTab = function() {
         var tab = new mm.MonitorTab({
