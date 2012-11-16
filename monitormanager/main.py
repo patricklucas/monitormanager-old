@@ -39,7 +39,7 @@ def main():
 
     engine = model.init_db()
     application = MonitorManagerApplication(engine)
-    application.listen(int(config.port), config.address)
+    application.listen(config.port.value, config.address.value)
 
     IOLoop.instance().start()
 

@@ -210,7 +210,7 @@ class MonitorManagerApplication(Application):
         ]
 
         settings = {
-            'template_path': unicode(config.template_path),
+            'template_path': config.template_path.value,
             'debug': config.debug,
         }
 

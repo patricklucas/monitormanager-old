@@ -48,7 +48,7 @@ class Monitor(Base):
 
 
 def init_db():
-    return create_engine(unicode(config.db_uri))
+    return create_engine(config.db_uri.value)
 
 def main():
     """Run python -m monitormanager.model to initialize the database"""
