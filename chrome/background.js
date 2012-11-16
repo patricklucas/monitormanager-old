@@ -9,7 +9,8 @@
 
         // State
         this.enabled = options.enabled || true;
-        this.service_url = options.service_url || "ws://localhost:8123/monitor/";
+        this.service_host = options.service_host || "localhost";
+        this.service_port = options.service_port || 8123;
         this.monitor_name = options.monitor_name || "InfraTopLeft";
 
         // Callbacks
@@ -19,8 +20,13 @@
             this.connect();
         };
 
+        this.service_uri = function() {
+            return "ws://" + this.service_host + ":" + this.service_port +
+                "/monitor/" + this.monitor_name;
+        };
+
         this.connect = function() {
-            this.ws = new WebSocket(this.service_url + this.monitor_name);
+            this.ws = new WebSocket(this.service_uri());
             this.ws.onmessage = this.onmessage;
             this.pollForConnect();
         };
