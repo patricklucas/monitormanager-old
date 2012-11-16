@@ -4,8 +4,12 @@
 <script src="popup.js"></script>
 <style>
 html, body {
-    width: 350px;
-    height: 500px;
+    width: 20em;
+    font-family: sans-serif;
+}
+
+div#nottaboptions {
+    color: #999;
 }
 
 div#taboptions {
@@ -16,20 +20,23 @@ div#taboptions {
 <body>
 <h1>Monitor Manager</h1>
 <div>
-    <input id="open_monitor_tab" type="button" value="Open Monitor Tab"/>
+    <input id="open_monitor_tab" type="button" value="Open New Monitor Tab"/>
 </div>
 <h2>Global Options</h2>
-<div>
+<p>
     <input id="disable_check" type="checkbox">
     <label for="disable_check">Disable Monitor Manager</label>
-</div>
-<div>
+</p>
+<p>
     <label for="service_netloc">Service Netloc:</label>
     <input id="service_netloc" type="text"/>
     <input id="service_netloc_save" type="button" value="save"/>
+</p>
+<h2>Tab Options</h2>
+<div id="nottaboptions">
+    This is not a monitor tab.
 </div>
 <div id="taboptions">
-    <h2>Tab Options</h2>
     <label for="monitor_name">Monitor Name:</label>
     <input id="monitor_name" type="text"/>
     <input id="monitor_name_save" type="button" value="save"/>

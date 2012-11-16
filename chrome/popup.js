@@ -32,6 +32,7 @@
     };
 
     var initTabNameField = function(tab) {
+        getEl('nottaboptions').style.display = 'none';
         getEl('taboptions').style.display = 'block';
         getEl('monitor_name').value = tab.getName();
         initEvent('monitor_name_save', 'click', function(e) {
