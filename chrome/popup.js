@@ -1,5 +1,5 @@
 (function() {
-    var bg = chrome.extension.getBackgroundPage();
+    var mm = chrome.extension.getBackgroundPage().mm;
 
     var getEl = function(id) {
         return document.getElementById(id);
@@ -34,23 +34,23 @@
 
     var initOpenButton = function() {
         initEvent('open_monitor_tab', 'click', function(e) {
-            bg.openMonitorTab();
+            mm.openMonitorTab();
             e.srcElement.disabled = true;
         });
     };
 
     var initDisableCheck = function() {
-        getEl('disable_check').checked = !bg.getEnabled();
+        getEl('disable_check').checked = !mm.getEnabled();
         initEvent('disable_check', 'change', function(e) {
-            bg.setEnabled(!e.srcElement.checked);
+            mm.setEnabled(!e.srcElement.checked);
         });
     };
 
     var initServiceNetlocInput = function() {
-        getEl('service_netloc').value = bg.getServiceNetloc();
+        getEl('service_netloc').value = mm.getServiceNetloc();
         initEvent('service_netloc_save', 'click', function(e) {
             var newServiceNetloc = getEl('service_netloc').value;
-            bg.setServiceNetloc(newServiceNetloc);
+            mm.setServiceNetloc(newServiceNetloc);
         });
     };
 
@@ -68,7 +68,7 @@
                 return;
             }
 
-            var tab = bg.getMonitorTab(tabs[0].id);
+            var tab = mm.getMonitorTab(tabs[0].id);
 
             if (tab) {
                 var tabctl = new TabControl(tab);

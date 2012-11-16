@@ -8,7 +8,12 @@
         "default_popup": "popup.html"
     },
     "background": {
-        "scripts": ["background.js"]
+        "scripts": [
+            "config.js",
+            "tabsocket.cls.js",
+            "monitortab.cls.js",
+            "background.js"
+        ]
     },
     "permissions": [
         "tabs"
