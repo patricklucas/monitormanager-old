@@ -4,6 +4,28 @@
     var service_netloc = mm.defaults.service_netloc;
     var monitorTabs = {};
 
+    // Try to load global parameters from storage
+    chrome.storage.local.get(['enabled', 'service_netloc'], function(items) {
+        var toSet = {};
+
+        if (items.enabled !== undefined) {
+            enabled = items.enabled;
+        } else {
+            toSet.enabled = enabled;
+        }
+
+        if (items.service_netloc !== undefined) {
+            service_netloc = items.service_netloc;
+        } else {
+            toSet.service_netloc = service_netloc;
+        }
+
+        // Set to defaults if unset
+        if (toSet) {
+            chrome.storage.local.set(toSet);
+        }
+    });
+
     mm.getEnabled = function(enable) {
         return enabled;
     };
@@ -15,6 +37,9 @@
 
         enabled = enable;
 
+        // Save enabled state to storage
+        chrome.storage.local.set({enabled: enabled});
+
         for (tabId in monitorTabs) {
             monitorTabs[tabId].setEnabled(enabled);
         }
@@ -25,6 +50,9 @@
     };
 
     mm.setServiceNetloc = function(netloc) {
+        // Save new netloc to storage
+        chrome.storage.local.set({service_netloc: netloc});
+
         for (tabId in monitorTabs) {
             monitorTabs[tabId].setServiceNetloc(netloc);
         };
