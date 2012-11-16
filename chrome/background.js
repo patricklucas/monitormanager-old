@@ -54,17 +54,7 @@
             }.bind(this), 1000);
         };
 
-        this.isEnabled = function() {
-            return this.enabled;
-        };
-
-        this.enable = function(enable) {
-            enable = !!enable;
-
-            if (this.enabled === enable) {
-                return;
-            };
-
+        this.setEnabled = function(enable) {
             if (enable) {
                 this.enabled = true;
                 this.connect();
@@ -73,10 +63,6 @@
                 this.ws.close();
                 this.ws = null;
             }
-        };
-
-        this.getServiceNetloc = function() {
-            return this.service_netloc;
         };
 
         this.setServiceNetloc = function(netloc) {
@@ -155,16 +141,8 @@
             };
         };
 
-        this.isEnabled = function() {
-            return this.socket.isEnabled();
-        };
-
-        this.enable = function(enable) {
-            return this.socket.enable(enable);
-        };
-
-        this.getServiceNetloc = function() {
-            return this.socket.getServiceNetloc();
+        this.setEnabled = function(enable) {
+            return this.socket.setEnabled(enable);
         };
 
         this.setServiceNetloc = function(netloc) {
@@ -182,7 +160,34 @@
         this.init();
     };
 
+    var enabled = true;
+    var service_netloc = "localhost:8123";
     var monitorTabs = {};
+
+    window.getEnabled = function(enable) {
+        return enabled;
+    };
+
+    window.setEnabled = function(enable) {
+        if (enable == enabled)
+            return;
+
+        enabled = enable;
+
+        for (tab in monitorTabs) {
+            monitorTabs[tab].setEnabled(enabled);
+        }
+    };
+
+    window.getServiceNetloc = function() {
+        return service_netloc;
+    };
+
+    window.setServiceNetloc = function(netloc) {
+        for (tab in monitorTabs) {
+            monitorTabs[tab].setServiceNetloc(netloc);
+        };
+    };
 
     window.getMonitorTab = function(tabId) {
         if (!tabId in monitorTabs)
