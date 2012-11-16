@@ -2,4 +2,4 @@ PyYAML==3.10
 SQLAlchemy==0.7.9
 simplejson==2.6.2
 tornado==2.4
--e git://github.com/dnephin/PyStaticConfiguration.git@919644823ae8d8979caeff99cfdc8aabfd1f0662#egg=PyStaticConfiguration-dev
+-e git://github.com/dnephin/PyStaticConfiguration.git@v0.4.5#egg=PyStaticConfiguration-dev
