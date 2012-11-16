@@ -9,8 +9,9 @@
     };
 
     mm.setEnabled = function(enable) {
-        if (enable == enabled)
+        if (enable == enabled) {
             return;
+        }
 
         enabled = enable;
 
@@ -30,8 +31,9 @@
     };
 
     mm.getMonitorTab = function(tabId) {
-        if (!tabId in monitorTabs)
+        if (!tabId in monitorTabs) {
             return null;
+        }
 
         return monitorTabs[tabId];
     };
