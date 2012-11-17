@@ -1,4 +1,5 @@
 (function() {
+
     var mm = chrome.extension.getBackgroundPage().mm;
 
     var getEl = function(id) {
@@ -56,12 +57,13 @@
         }
 
         opentabs.innerText = text;
-    }
+    };
 
-    document.addEventListener('DOMContentLoaded', function () {
+    var init = function() {
         initOpenButton();
         initDisableCheck();
         initServiceNetlocField();
+        initOpenTabsCount();
 
         chrome.tabs.query({
             currentWindow: true,
@@ -78,8 +80,8 @@
                 initTabNameField(tab);
             };
         });
+    };
 
-        initOpenTabsCount();
-    });
+    document.addEventListener('DOMContentLoaded', init);
 
 })();
