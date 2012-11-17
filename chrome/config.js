@@ -1,6 +1,9 @@
 (function(root) {
+    /**
+     * Provide the initial window.mm object and a global config interface.
+     */
 
-    var mm = {};
+    var mm = root.mm = {};
 
     var config = {
         enabled: true,
@@ -9,6 +12,7 @@
         default_monitor_url: "about:blank"
     };
 
+    // Config values to put in local storage
     var storageConfigKeys = ['enabled', 'service_netloc'];
 
     var configLoaded = false;
@@ -27,6 +31,7 @@
         return config[key];
     };
 
+    // Update config object and save to local storage
     mm.setConfig = function(key, value) {
         if (!key in storageConfigKeys) {
             return;
@@ -57,7 +62,5 @@
     };
 
     loadConfig();
-
-    root.mm = mm;
 
 })(window);

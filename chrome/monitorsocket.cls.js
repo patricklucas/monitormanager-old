@@ -1,7 +1,18 @@
 (function(mm) {
+    /**
+     * Establishes and maintains a websocket connection to the server.
+     *
+     * Connects to the endpoint defined by service_netloc and monitor_name,
+     * letting the owner handle onmessage events.
+     *
+     * Is resiliant to service interruptions and intelligently handles changes
+     * to the enabled state, service_netloc, and monitor_name.
+     *
+     * If enabled and the websocket closes, retry every 1000ms until connected
+     * or disabled.
+     */
 
     var MonitorSocket = function(options) {
-        // Refs
         this.ws = null;
 
         // State
@@ -28,9 +39,14 @@
             this.pollForConnect();
         };
 
-        this.reconnect = function() {
+        this.disconnect = function() {
             this.ws.onclose = null; // Disable the reconnecting onclose handler
             this.ws.close();
+            this.ws = null;
+        };
+
+        this.reconnect = function() {
+            this.disconnect();
             this.connect();
         };
 
@@ -57,8 +73,7 @@
                 this.connect();
             } else {
                 this.enabled = false;
-                this.ws.close();
-                this.ws = null;
+                this.disconnect();
             }
         };
 

@@ -1,4 +1,14 @@
 (function(mm) {
+    /**
+     * Keeps the state of a single monitor tab.
+     *
+     * Handles onmessage events from a MonitorSocket. New tab control commands
+     * should only need be implemented here.
+     *
+     * Keeps references to the Chrome tab object it represents and the current
+     * URL. Proxies changes to monitor name or global enable and service_netloc
+     * options to the MonitorSocket.
+     */
 
     var MonitorTab = function(options) {
         this.socket = null;

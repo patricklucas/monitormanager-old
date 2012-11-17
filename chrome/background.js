@@ -1,4 +1,7 @@
 (function(mm) {
+    /**
+     * Track open monitor tabs and provide the interface for the popup.
+     */
 
     mm.ready(function() {
         var monitorTabs = {}; // tabId -> MonitorTab
@@ -51,9 +54,11 @@
                 monitor_name: mm.getConfig('default_monitor_name'),
                 monitor_url: mm.getConfig('default_monitor_url'),
                 onCreate: function() {
+                    // When the tab exists, add it to monitorTabs
                     monitorTabs[tab.tab.id] = tab;
                 },
                 onRemove: function() {
+                    // Fires when the tab is closed
                     delete monitorTabs[tab.tab.id];
                 }
             });
