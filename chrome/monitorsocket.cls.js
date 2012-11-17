@@ -15,12 +15,10 @@
     var MonitorSocket = function(options) {
         this.ws = null;
 
-        // State
         this.enabled = options.enabled;
         this.service_netloc = options.service_netloc;
         this.monitor_name = options.monitor_name;
 
-        // Callbacks
         this.onmessage = options.onmessage;
 
         this.init = function() {

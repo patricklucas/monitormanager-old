@@ -14,9 +14,7 @@
         this.socket = null;
         this.tab = null;
 
-        this.options = options;
-
-        this.monitor_url = this.options.monitor_url;
+        this.monitor_url = options.monitor_url;
 
         this.init = function() {
             // Don't connect until we have a tab
@@ -30,20 +28,20 @@
                 }.bind(this));
 
                 this.socket = new mm.MonitorSocket({
-                    enabled: this.options.enabled,
-                    service_netloc: this.options.service_netloc,
-                    monitor_name: this.options.monitor_name,
+                    enabled: options.enabled,
+                    service_netloc: options.service_netloc,
+                    monitor_name: options.monitor_name,
                     onmessage: this.onmessage.bind(this)
                 });
 
-                this.options.onCreate();
+                options.onCreate();
             }.bind(this));
         };
 
         this.destroy = function() {
             this.socket.disconnect();
             this.socket = null;
-            this.options.onRemove();
+            options.onRemove();
             this.tab = null; // Nullify tab after onRemove
         };
 
