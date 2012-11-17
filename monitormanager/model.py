@@ -28,10 +28,6 @@ class Monitor(Base):
             .first()
 
     @classmethod
-    def getall(cls, session):
-        return session.query(Monitor)
-
-    @classmethod
     def delete(cls, session, monitor_name):
         return bool(session.query(Monitor) \
             .filter(Monitor.name == monitor_name) \

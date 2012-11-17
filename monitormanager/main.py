@@ -13,7 +13,8 @@ DEFAULT_CONFIG_PATH = "config.yaml"
 
 def main():
     parser = optparse.OptionParser()
-    parser.add_option('-c', '--config', help='The path to the config file')
+    parser.add_option('-c', '--config', help='The path to the config file',
+        default=DEFAULT_CONFIG_PATH)
     parser.add_option('-a', '--address')
     parser.add_option('-p', '--port', type='int')
     parser.add_option('--debug', action='store_true')
@@ -22,11 +23,10 @@ def main():
     if args:
         parser.error("No positional arguments")
 
-    if opts.config and not os.path.exists(opts.config):
+    if not os.path.exists(opts.config):
         parser.error("Config file not found at '%s'" % opts.config)
 
-    config_path = opts.config if opts.config else DEFAULT_CONFIG_PATH
-    config.load(config_path)
+    config.load(opts.config)
 
     if opts.address:
         config.address = opts.address

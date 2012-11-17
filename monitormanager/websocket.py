@@ -21,6 +21,7 @@ def url_message(url):
 
 
 class WebSocketStore(object):
+    """Handle pub/sub to a set of WebSocketHandler weakrefs"""
 
     def __init__(self):
         self._clients = defaultdict(WeakSet)

@@ -38,11 +38,8 @@ class MonitorSocketHandler(WebSocketHandler):
         websockets.add(monitor_name, self)
 
         monitor = Monitor.get(self.db, monitor_name)
-
-        if not monitor:
-            return
-
-        self.write_message(url_message(monitor.url))
+        if monitor:
+            self.write_message(url_message(monitor.url))
 
     def on_message(self, message):
         pass
@@ -62,10 +59,7 @@ class ManageMonitorsHandler(BaseRequestHandler):
     def get(self):
         desc = (self.get_argument('desc', "false") == "true")
 
-        order_by = Monitor.name
-        if desc:
-            order_by = order_by.desc()
-
+        order_by = Monitor.name.desc() if desc else Monitor.name
         query = self.db.query(Monitor) \
             .order_by(order_by)
 
@@ -95,7 +89,6 @@ class ManageMonitorHandler(BaseRequestHandler):
             raise HTTPError(400)
 
         monitor.url = data['url']
-
         self.db.commit()
 
         websockets.publish(monitor.name, url_message(monitor.url))

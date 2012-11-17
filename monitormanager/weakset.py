@@ -4,6 +4,7 @@ from __future__ import absolute_import
 import weakref
 
 class WeakSet(object):
+    """Approximation of weakref.WeakSet which appears in Python 2.7"""
 
     def __init__(self):
         super(WeakSet, self).__init__()
