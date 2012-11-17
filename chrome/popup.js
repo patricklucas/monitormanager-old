@@ -42,7 +42,7 @@
     };
 
     var initOpenTabsCount = function() {
-        var count = mm.numOpenMonitorTabs();
+        var count = mm.numMonitorTabs();
         var opentabs = getEl('opentabs');
         var text = "";
 

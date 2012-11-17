@@ -42,7 +42,7 @@
             return monitorTabs[tabId];
         };
 
-        mm.numOpenMonitorTabs = function() {
+        mm.numMonitorTabs = function() {
             return Object.keys(monitorTabs).length;
         };
 
