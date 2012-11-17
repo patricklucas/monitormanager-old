@@ -24,7 +24,9 @@
         this.onmessage = options.onmessage;
 
         this.init = function() {
-            this.connect();
+            if (this.enabled) {
+                this.connect();
+            }
         };
 
         this.service_uri = function() {
@@ -52,6 +54,10 @@
 
         this.pollForConnect = function() {
             setTimeout(function() {
+                if (!this.enabled) {
+                    return; // Cease polling if disabled
+                }
+
                 var state = this.ws.readyState;
                 if (state == WebSocket.OPEN) {
                     this.ws.onclose = function() {
