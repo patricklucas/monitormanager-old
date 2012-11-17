@@ -24,9 +24,8 @@
                 this.tab = newTab;
 
                 chrome.tabs.onRemoved.addListener(function(tabId) {
-                    if (this.tab && this.tab.id == tabId) {
-                        this.options.onRemove();
-                        this.tab = null;
+                    if (this.tab.id == tabId) {
+                        this.destroy();
                     }
                 }.bind(this));
 
@@ -39,6 +38,13 @@
 
                 this.options.onCreate();
             }.bind(this));
+        };
+
+        this.destroy = function() {
+            this.socket.close();
+            this.socket = null;
+            this.tab = null;
+            this.options.onRemove();
         };
 
         this.actionReload = function(hard) {
