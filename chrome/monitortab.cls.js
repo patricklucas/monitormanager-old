@@ -41,10 +41,10 @@
         };
 
         this.destroy = function() {
-            this.socket.close();
+            this.socket.disconnect();
             this.socket = null;
-            this.tab = null;
             this.options.onRemove();
+            this.tab = null; // Nullify tab after onRemove
         };
 
         this.actionReload = function(hard) {

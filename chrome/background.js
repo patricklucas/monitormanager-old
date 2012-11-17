@@ -18,7 +18,7 @@
             mm.setConfig('enabled', enable);
 
             for (var tabId in monitorTabs) {
-                monitorTabs[tabId].setEnabled(enabled);
+                monitorTabs[tabId].setEnabled(enable);
             }
         };
 

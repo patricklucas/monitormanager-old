@@ -16,7 +16,7 @@
         this.ws = null;
 
         // State
-        this.enabled = options.enabled || true;
+        this.enabled = options.enabled;
         this.service_netloc = options.service_netloc;
         this.monitor_name = options.monitor_name;
 
@@ -79,7 +79,10 @@
 
         this.setServiceNetloc = function(netloc) {
             this.service_netloc = netloc;
-            this.reconnect();
+
+            if (this.enabled) {
+                this.reconnect();
+            }
         };
 
         this.getName = function() {
@@ -88,7 +91,10 @@
 
         this.setName = function(name) {
             this.monitor_name = name;
-            this.reconnect();
+
+            if (this.enabled) {
+                this.reconnect();
+            }
         };
 
         this.init();
