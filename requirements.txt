@@ -1,5 +1,5 @@
-PyYAML==3.10
-SQLAlchemy==0.7.9
+PyStaticConfiguration==0.7.2
+PyYAML==3.11
+SQLAlchemy==0.9.7
 simplejson==2.6.2
-tornado==2.4
--e git://github.com/dnephin/PyStaticConfiguration.git@v0.4.5#egg=PyStaticConfiguration-dev
+tornado==2.4.1
