@@ -42,8 +42,8 @@ byte_swap () {
 
 crmagic_hex="4372 3234" # Cr24
 version_hex="0200 0000" # 2
-pub_len_hex=$(byte_swap $(printf '%08x\n' $(ls -l "$pub" | awk '{print $5}')))
-sig_len_hex=$(byte_swap $(printf '%08x\n' $(ls -l "$sig" | awk '{print $5}')))
+pub_len_hex=$(byte_swap $(printf '%08x\n' $(wc -c "$pub" | awk '{print $1}')))
+sig_len_hex=$(byte_swap $(printf '%08x\n' $(wc -c "$sig" | awk '{print $1}')))
 (
   echo "$crmagic_hex $version_hex $pub_len_hex $sig_len_hex" | xxd -r -p
   cat "$pub" "$sig" "$zip"
