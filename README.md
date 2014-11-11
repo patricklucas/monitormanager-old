@@ -1,5 +1,10 @@
+Deprecated
+==========
+
+This project is deprecated. Check out https://github.com/patricklucas/monitormanager for something new.
+
 monitormanager
-==============
+--------------
 
 A Google Chrome extension and Python Tornado application for managing Chrome tabs on monitors.
 
